@@ -1,5 +1,10 @@
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
+import { authConfig } from "@/auth.config";
+
+// Uses the edge-safe config (no providers/bcrypt) so the middleware bundle
+// never pulls in Node-only APIs — see src/auth.config.ts.
+const { auth } = NextAuth(authConfig);
 
 const PUBLIC_PATHS = ["/login", "/api/auth"];
 

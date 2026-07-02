@@ -1,8 +1,8 @@
 "use client";
 
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import type { Domain, DashboardOverview, MaturityResponse, TrendPoint } from "@/types/api";
+import type { Domain, DashboardOverview, HeatmapResponse, TrendPoint } from "@/types/api";
 import { Gauge } from "@/components/charts/gauge";
 import { TrendChart } from "@/components/charts/trend-chart";
 
@@ -21,12 +21,13 @@ export function DiagnosticTab({ periodLabel }: { periodLabel: string }) {
   });
 
   const shortDomains = (domainsData?.domains ?? []).slice(0, 8);
-  const maturityQueries = useQueries({
-    queries: shortDomains.map((d) => ({
-      queryKey: ["dashboard-maturity", periodLabel, d.id],
-      queryFn: () => api.get<MaturityResponse>(`/api/dashboard/maturity?period=${periodLabel}&domainId=${d.id}`),
-      enabled: !!periodLabel,
-    })),
+  const domainIds = shortDomains.map((d) => d.id).join(",");
+  // Single batched request for all 8 domains' heatmap rows, instead of one
+  // request (and one DB round-trip) per domain.
+  const { data: heatmapData } = useQuery({
+    queryKey: ["dashboard-heatmap", periodLabel, domainIds],
+    queryFn: () => api.get<HeatmapResponse>(`/api/dashboard/heatmap?period=${periodLabel}&domainIds=${domainIds}`),
+    enabled: !!periodLabel && shortDomains.length > 0,
   });
 
   if (!overview || !domainsData) return <div className="empty-state">Loading…</div>;
@@ -45,8 +46,8 @@ export function DiagnosticTab({ periodLabel }: { periodLabel: string }) {
                   ML {i}
                 </div>
               ))}
-              {shortDomains.map((d, di) => {
-                const levels = maturityQueries[di]?.data?.levels ?? [];
+              {shortDomains.map((d) => {
+                const levels = heatmapData?.byDomain[d.id] ?? [];
                 return (
                   <div key={d.id} style={{ display: "contents" }}>
                     <div style={{ fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", padding: "4px 0" }}>

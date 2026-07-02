@@ -56,6 +56,12 @@ export interface MaturityResponse {
   levels: MaturityLevelRow[];
 }
 
+export interface HeatmapResponse {
+  period: { id: string; label: string };
+  hasDetailedData: boolean;
+  byDomain: Record<number, MaturityLevelRow[]>;
+}
+
 export interface TrendPoint {
   period: string;
   complete: number;

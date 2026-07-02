@@ -2,25 +2,14 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import type { Role } from "@prisma/client";
+import { authConfig } from "@/auth.config";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      role: Role;
-    };
-  }
-  interface User {
-    role: Role;
-  }
-}
-
+// Full auth config, including the Credentials provider (needs bcryptjs +
+// Prisma, both Node-only). Only imported by API routes and server
+// components, which run in the Node.js runtime — never by middleware.ts.
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
-  pages: { signIn: "/login" },
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -32,7 +21,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+        const normalizedEmail = email.toLowerCase();
+        const { allowed } = checkRateLimit(`login:${normalizedEmail}`);
+        if (!allowed) return null;
+
+        const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
         if (!user) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
@@ -42,18 +35,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id as string;
-        token.role = (user as { role: Role }).role;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.role = token.role as Role;
-      return session;
-    },
-  },
 });
