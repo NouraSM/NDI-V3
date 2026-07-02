@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sutherland | Enterprise Data Management Office</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <style>
+:root {
+    --navy: #111142;
+    --navy-mid: #1e1e5a;
+    --navy-light: #2a2a6e;
+    --pink: #ef335e;
+    --pink-soft: #ff6b8a;
+    --teal: #00c9b7;
+    --teal-dark: #009e8f;
+    --purple: #7c5cfc;
+    --amber: #f5a623;
+    --bg: #f4f5f9;
+    --card: #ffffff;
+    --text: #2d2d54;
+    --text-light: #6e6e8a;
+    --border: #e4e6ee;
+    --shadow: 0 2px 12px rgba(17,17,66,0.06);
+    --shadow-lg: 0 8px 32px rgba(17,17,66,0.10);
+    --radius: 14px;
+    --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* ========== LOGIN ========== */
+#login-page {
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh; background: var(--navy);
+    position: relative; overflow: hidden;
+}
+#login-page::before {
+    content: ''; position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(239,51,94,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px; border-radius: 50%;
+}
+#login-page::after {
+    content: ''; position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 70%);
+    bottom: -150px; left: -100px; border-radius: 50%;
+}
+.login-box {
+    background: rgba(255,255,255,0.04); backdrop-filter: blur(40px);
+    border: 1px solid rgba(255,255,255,0.08); padding: 48px 40px;
+    border-radius: 20px; width: 400px; text-align: center;
+    position: relative; z-index: 2; animation: fadeUp 0.6s ease;
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+.login-brand .logo-icon {
+    width: 40px; height: 40px; background: var(--pink); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: white; font-size: 18px;
+}
+.login-brand h1 { color: white; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.login-subtitle { color: rgba(255,255,255,0.45); font-size: 13px; margin-bottom: 32px; font-family: 'Space Mono', monospace; }
+.login-box input {
+    width: 100%; padding: 14px 16px; margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    background: rgba(255,255,255,0.05); color: white; font-size: 14px; font-family: inherit; transition: border 0.3s;
+}
+.login-box input::placeholder { color: rgba(255,255,255,0.3); }
+.login-box input:focus { outline: none; border-color: var(--pink); background: rgba(255,255,255,0.08); }
+.login-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--pink) 0%, #d4264d 100%);
+    color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; font-family: inherit; margin-top: 6px;
+}
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(239,51,94,0.35); }
+
+/* ========== DASHBOARD SHELL ========== */
+#dashboard { display: none; height: 100vh; grid-template-columns: 290px 1fr; grid-template-rows: 64px 1fr; }
+header {
+    grid-column: 1 / -1; background: var(--card);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 28px; border-bottom: 1px solid var(--border); z-index: 10;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.header-logo-icon {
+    width: 34px; height: 34px; background: var(--navy); border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s;
+}
+.header-logo-icon:hover { background: var(--pink); }
+.header-title { font-size: 15px; font-weight: 700; color: var(--navy); }
+.header-title span { color: var(--pink); }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.quarter-select { padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--text); background: var(--bg); cursor: pointer; }
+.logout-btn { background: none; border: 1px solid var(--border); padding: 8px 18px; border-radius: var(--radius-sm); color: var(--pink); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.logout-btn:hover { background: var(--pink); color: white; border-color: var(--pink); }
+
+/* Sidebar */
+aside { background: var(--navy); overflow-y: auto; padding-bottom: 20px; }
+aside::-webkit-scrollbar { width: 4px; }
+aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+.side-header { padding: 20px 22px 14px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); font-weight: 700; font-family: 'Space Mono', monospace; }
+.domain-item { padding: 12px 22px; color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; transition: all 0.25s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 10px; line-height: 1.3; }
+.domain-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.9); }
+.domain-item.active { background: rgba(239,51,94,0.1); border-left-color: var(--pink); color: white; font-weight: 500; }
+.domain-num { width: 24px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); flex-shrink: 0; font-family: 'Space Mono', monospace; }
+.domain-item.active .domain-num { background: var(--pink); color: white; }
+
+/* Main Content */
+main { padding: 0; overflow-y: auto; background: var(--bg); }
+main::-webkit-scrollbar { width: 6px; }
+main::-webkit-scrollbar-thumb { background: #ccc; border-radius: 6px; }
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+/* ========== OVERVIEW ========== */
+.overview-content { padding: 28px; }
+.overview-tabs { display: flex; gap: 4px; background: var(--card); padding: 4px; border-radius: 10px; margin-bottom: 24px; width: fit-content; box-shadow: var(--shadow); flex-wrap: wrap; }
+.overview-tab { padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-light); font-family: inherit; transition: all 0.2s; }
+.overview-tab.active { background: var(--navy); color: white; }
+.overview-tab:hover:not(.active) { background: var(--bg); }
+
+/* KPI Row */
+.kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.kpi-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; }
+.kpi-card:nth-child(1)::after { background: var(--navy); }
+.kpi-card:nth-child(2)::after { background: var(--teal); }
+.kpi-card:nth-child(3)::after { background: var(--amber); }
+.kpi-card:nth-child(4)::after { background: var(--pink); }
+.kpi-card:nth-child(5)::after { background: var(--purple); }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); font-weight: 600; margin-bottom: 8px; }
+.kpi-value { font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; }
+.kpi-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; margin-top: 6px; padding: 3px 8px; border-radius: 20px; }
+.kpi-delta.up { background: rgba(0,201,183,0.1); color: var(--teal-dark); }
+.kpi-delta.down { background: rgba(239,51,94,0.1); color: var(--pink); }
+
+/* Charts */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.chart-card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+.chart-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.chart-subtitle { font-size: 11px; color: var(--text-light); margin-bottom: 18px; }
+.chart-area { width: 100%; position: relative; }
+.chart-card.full { grid-column: 1 / -1; }
+
+/* Bar Charts */
+.bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 200px; padding-top: 20px; }
+.bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+.bar-wrapper { width: 100%; display: flex; justify-content: center; gap: 3px; align-items: flex-end; flex: 1; }
+.bar { width: 18px; border-radius: 4px 4px 0 0; transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; cursor: pointer; }
+.bar:hover { opacity: 0.85; filter: brightness(1.1); }
+.bar-label { font-size: 10px; color: var(--text-light); text-align: center; white-space: nowrap; font-weight: 500; }
+.bar-value { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.maturity-bars { display: flex; align-items: flex-end; gap: 20px; height: 200px; padding: 20px 0 0; }
+.maturity-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.maturity-bar { width: 40px; border-radius: 6px 6px 0 0; transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; cursor: pointer; }
+.maturity-bar:hover { filter: brightness(1.15); }
+.maturity-pct { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: var(--text); }
+.maturity-level { font-size: 12px; font-weight: 700; color: var(--text-light); }
+
+/* Legend */
+.chart-legend { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-light); font-weight: 500; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+/* Tables */
+.compliance-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.compliance-table th { text-align: left; padding: 12px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); font-weight: 700; border-bottom: 2px solid var(--border); background: var(--bg); }
+.compliance-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.compliance-table tbody tr { cursor: pointer; transition: background 0.15s; }
+.compliance-table tbody tr:hover { background: rgba(124,92,252,0.03); }
+.progress-bar-bg { width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+/* ========== DOMAIN DETAIL ========== */
+.domain-detail-content { padding: 28px; }
+.domain-header-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.domain-header-bar h2 { font-size: 20px; font-weight: 700; color: var(--navy); }
+.domain-header-bar h2 span { color: var(--pink); }
+.breadcrumb { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 6px; }
+.breadcrumb a { color: var(--pink); text-decoration: none; font-weight: 600; cursor: pointer; }
+.section-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+.section-tab { padding: 12px 28px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text-light); border: none; background: none; font-family: inherit; position: relative; transition: color 0.2s; }
+.section-tab::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: transparent; transition: background 0.2s; }
+.section-tab.active { color: var(--pink); }
+.section-tab.active::after { background: var(--pink); }
+.section-tab:hover:not(.active) { color: var(--text); }
+.section-panel { display: none; }
+.section-panel.active { display: block; }
+.domain-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.domain-kpi { background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); border-left: 4px solid var(--navy); }
+.domain-kpi.teal { border-left-color: var(--teal); }
+.domain-kpi.amber { border-left-color: var(--amber); }
+.domain-kpi.pink { border-left-color: var(--pink); }
+.domain-kpi.purple { border-left-color: var(--purple); }
+.domain-kpi-label { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.domain-kpi-value { font-size: 26px; font-weight: 700; color: var(--navy); margin-top: 4px; }
+
+/* Excel Table */
+.excel-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.excel-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); background: #fafbfd; }
+.excel-toolbar-left { display: flex; align-items: center; gap: 10px; }
+.excel-icon { width: 28px; height: 28px; background: #217346; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 13px; }
+.excel-toolbar h4 { font-size: 14px; color: var(--navy); }
+.excel-search { padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; width: 220px; }
+.excel-search:focus { outline: none; border-color: var(--teal); }
+.excel-table-wrapper { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+.excel-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.excel-table th { position: sticky; top: 0; background: var(--navy); color: white; padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; white-space: nowrap; z-index: 2; }
+.excel-table td { padding: 10px 14px; border-bottom: 1px solid #f0f1f5; white-space: nowrap; }
+.excel-table tbody tr:nth-child(even) { background: #fafbfd; }
+.excel-table tbody tr:hover { background: rgba(0,201,183,0.05); }
+.level-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+.lvl-0 { background: #fee; color: #c00; } .lvl-1 { background: #fff0e0; color: #c76a00; } .lvl-2 { background: #fff8db; color: #9a7b00; }
+.lvl-3 { background: #e8f5e9; color: #2e7d32; } .lvl-4 { background: #e0f2f1; color: #00796b; } .lvl-5 { background: #ede7f6; color: #5e35b1; }
+.evidence-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.ev-complete { background: rgba(0,201,183,0.1); color: var(--teal-dark); }
+.ev-partial { background: rgba(245,166,35,0.1); color: #c76a00; }
+.ev-incomplete { background: rgba(239,51,94,0.1); color: var(--pink); }
+
+/* Power BI */
+.pbi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.pbi-card { background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+.pbi-card.full { grid-column: 1 / -1; }
+.pbi-card h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.pbi-card .chart-subtitle { margin-bottom: 16px; }
+.grouped-bars { display: flex; gap: 8px; align-items: flex-end; height: 220px; padding-top: 20px; }
+.grouped-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+.grouped-bar-set { display: flex; gap: 3px; align-items: flex-end; flex: 1; width: 100%; justify-content: center; }
+.g-bar { width: 16px; border-radius: 3px 3px 0 0; transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; cursor: pointer; }
+.g-bar:hover { filter: brightness(1.15); }
+.g-bar .bar-value { font-size: 9px; }
+.line-chart-container { position: relative; height: 220px; padding: 10px 0; }
+.line-chart-svg { width: 100%; height: 100%; }
+.donut-container { display: flex; align-items: center; justify-content: center; gap: 30px; }
+.donut-svg { width: 160px; height: 160px; }
+.donut-legend { display: flex; flex-direction: column; gap: 10px; }
+.donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); }
+.donut-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+.donut-legend-value { font-weight: 700; margin-left: auto; padding-left: 14px; font-family: 'Space Mono', monospace; }
+
+/* Filters */
+.filter-row { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-select { padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 12px; color: var(--text); background: var(--card); cursor: pointer; }
+.filter-label { font-size: 12px; font-weight: 600; color: var(--text-light); }
+
+/* Gauge */
+.gauge-container { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+.gauge-svg { width: 180px; height: 100px; }
+.gauge-value-text { font-size: 28px; font-weight: 700; color: var(--navy); margin-top: 4px; }
+.gauge-label-text { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+/* Heatmap */
+.heatmap-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.heatmap-cell { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s; }
+.heatmap-cell:hover { transform: scale(1.08); }
+.heatmap-cell-label { font-size: 8px; font-weight: 500; opacity: 0.7; margin-top: 2px; }
+.heatmap-header { background: none !important; font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; }
+
+/* Tooltip */
+.tooltip { display: none; position: fixed; background: var(--navy); color: white; padding: 8px 14px; border-radius: 8px; font-size: 12px; z-index: 1000; pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+/* Animations */
+@keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: slideIn 0.4s ease forwards; opacity: 0; }
+.animate-in:nth-child(1) { animation-delay: 0.05s; } .animate-in:nth-child(2) { animation-delay: 0.1s; }
+.animate-in:nth-child(3) { animation-delay: 0.15s; } .animate-in:nth-child(4) { animation-delay: 0.2s; }
+.animate-in:nth-child(5) { animation-delay: 0.25s; }
+
+/* ========== OVERALL PAGE ========== */
+.overall-content { padding: 28px; }
+.overall-hero { background: linear-gradient(135deg, var(--navy) 0%, #2a2068 50%, #3d2b6e 100%); border-radius: var(--radius); padding: 40px 36px; margin-bottom: 24px; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-lg); }
+.overall-hero::before { content: ''; position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(239,51,94,0.18) 0%, transparent 70%); top: -80px; right: -40px; border-radius: 50%; }
+.overall-hero::after { content: ''; position: absolute; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,201,183,0.12) 0%, transparent 70%); bottom: -60px; left: 60px; border-radius: 50%; }
+.overall-hero-inner { position: relative; z-index: 2; }
+.overall-hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
+.overall-hero h1 span { color: var(--pink); }
+.overall-hero p { font-size: 14px; opacity: 0.65; max-width: 600px; line-height: 1.6; }
+.overall-stats-strip { display: flex; gap: 32px; margin-top: 24px; }
+.overall-stat { text-align: center; }
+.overall-stat-value { font-size: 30px; font-weight: 700; line-height: 1; }
+.overall-stat-value.teal { color: var(--teal); } .overall-stat-value.amber { color: var(--amber); }
+.overall-stat-value.pink-c { color: var(--pink-soft); } .overall-stat-value.purple { color: var(--purple); }
+.overall-stat-label { font-size: 11px; opacity: 0.55; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.6px; }
+.overall-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.overall-section-header h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
+.overall-section-header .see-all { font-size: 12px; color: var(--pink); font-weight: 600; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
+.overall-section-header .see-all:hover { opacity: 0.7; }
+.domain-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.domain-card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border-top: 4px solid transparent; position: relative; }
+.domain-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.domain-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.domain-card-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: white; flex-shrink: 0; }
+.domain-card-name { font-size: 13px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+.domain-card-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.dc-metric { text-align: center; }
+.dc-metric-val { font-size: 18px; font-weight: 700; }
+.dc-metric-lbl { font-size: 9px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; }
+.domain-card-progress { display: flex; align-items: center; gap: 10px; }
+.domain-card-progress .progress-bar-bg { flex: 1; height: 6px; }
+.domain-card-pct { font-size: 14px; font-weight: 700; font-family: 'Space Mono', monospace; min-width: 40px; text-align: right; }
+.overall-quick-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.quick-card { background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+.quick-card h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.quick-card .chart-subtitle { margin-bottom: 14px; }
+.risk-list { display: flex; flex-direction: column; gap: 8px; }
+.risk-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--bg); cursor: pointer; transition: background 0.15s; }
+.risk-item:hover { background: #ecedf3; }
+.risk-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.risk-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text); }
+.risk-score { font-size: 12px; font-weight: 700; font-family: 'Space Mono', monospace; }
+
+/* ========== AUDIT CENTER ========== */
+.audit-content { padding: 28px; }
+.audit-page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+.audit-page-header h2 { font-size: 20px; font-weight: 700; color: var(--navy); margin-top: 4px; }
+.audit-action-btn { padding: 10px 22px; background: var(--pink); color: white; border: none; border-radius: var(--radius-sm); font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+.audit-action-btn:hover { background: #d4264d; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(239,51,94,0.3); }
+.audit-tab-panel { display: none; }
+.audit-schedule-tbl { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 12px; }
+.audit-schedule-tbl th { text-align: left; padding: 12px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-light); font-weight: 700; border-bottom: 2px solid var(--border); background: var(--bg); }
+.audit-schedule-tbl td { padding: 13px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.audit-schedule-tbl tbody tr { transition: background 0.15s; }
+.audit-schedule-tbl tbody tr:hover { background: rgba(0,201,183,0.03); }
+
+/* Severity / Status Badges */
+.severity-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.sev-critical { background: rgba(239,51,94,0.12); color: #c9223f; }
+.sev-high { background: rgba(231,76,60,0.12); color: #c0392b; }
+.sev-medium { background: rgba(245,166,35,0.12); color: #b37300; }
+.sev-low { background: rgba(0,201,183,0.12); color: var(--teal-dark); }
+.finding-status { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.fs-open { background: rgba(239,51,94,0.1); color: var(--pink); }
+.fs-in-progress { background: rgba(245,166,35,0.1); color: #b37300; }
+.fs-resolved { background: rgba(0,201,183,0.1); color: var(--teal-dark); }
+.fs-closed { background: rgba(110,110,138,0.1); color: var(--text-light); }
+.audit-status { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.as-scheduled { background: rgba(124,92,252,0.1); color: var(--purple); }
+.as-in-progress { background: rgba(245,166,35,0.1); color: #b37300; }
+.as-completed { background: rgba(0,201,183,0.1); color: var(--teal-dark); }
+.as-overdue { background: rgba(239,51,94,0.1); color: var(--pink); }
+
+/* Activity Trail */
+.trail-timeline { padding: 16px 0; position: relative; }
+.trail-timeline::before { content: ''; position: absolute; left: 18px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.trail-item { display: flex; gap: 16px; padding: 12px 0; position: relative; }
+.trail-dot { width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--card); flex-shrink: 0; margin-top: 4px; position: relative; z-index: 2; box-shadow: 0 0 0 2px var(--border); }
+.trail-dot.evidence { background: var(--teal); box-shadow: 0 0 0 2px var(--teal); }
+.trail-dot.finding { background: var(--pink); box-shadow: 0 0 0 2px var(--pink); }
+.trail-dot.audit { background: var(--purple); box-shadow: 0 0 0 2px var(--purple); }
+.trail-dot.system { background: var(--amber); box-shadow: 0 0 0 2px var(--amber); }
+.trail-body { flex: 1; background: var(--card); border-radius: var(--radius-sm); padding: 12px 16px; border: 1px solid var(--border); }
+.trail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.trail-action { font-size: 13px; font-weight: 600; color: var(--navy); }
+.trail-time { font-size: 11px; color: var(--text-light); font-family: 'Space Mono', monospace; }
+.trail-detail { font-size: 12px; color: var(--text-light); line-height: 1.5; }
+.trail-user { font-weight: 600; color: var(--text); }
+.trail-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-right: 6px; }
+.trail-tag.evidence { background: rgba(0,201,183,0.1); color: var(--teal-dark); }
+.trail-tag.finding { background: rgba(239,51,94,0.1); color: var(--pink); }
+.trail-tag.audit { background: rgba(124,92,252,0.1); color: var(--purple); }
+.trail-tag.system { background: rgba(245,166,35,0.1); color: #b37300; }
+
+/* Export Grid */
+.export-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; }
+.export-card { background: var(--bg); border-radius: var(--radius); padding: 20px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+.export-card:hover { border-color: var(--pink); background: white; transform: translateY(-2px); box-shadow: var(--shadow); }
+.export-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+.export-card h5 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.export-card p { font-size: 11px; color: var(--text-light); line-height: 1.4; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(17,17,66,0.5); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: var(--card); border-radius: var(--radius); width: 560px; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: fadeUp 0.3s ease; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.modal-header h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
+.modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-light); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.modal-close:hover { background: var(--bg); }
+.modal-body { padding: 24px; }
+.modal-form-group { margin-bottom: 16px; }
+.modal-form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.modal-form-group input, .modal-form-group select, .modal-form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--text); background: var(--bg); transition: border 0.2s; }
+.modal-form-group input:focus, .modal-form-group select:focus, .modal-form-group textarea:focus { outline: none; border-color: var(--pink); background: white; }
+.modal-form-group textarea { resize: vertical; min-height: 80px; }
+.modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.modal-submit-btn { width: 100%; padding: 12px; background: var(--pink); color: white; border: none; border-radius: var(--radius-sm); font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; margin-top: 8px; transition: all 0.2s; }
+.modal-submit-btn:hover { background: #d4264d; }
+
+/* Domain Audit Panel */
+.domain-audit-section { margin-bottom: 20px; }
+.domain-audit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.domain-audit-header h4 { font-size: 15px; font-weight: 700; color: var(--navy); }
+.finding-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px 18px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; display: flex; align-items: flex-start; gap: 14px; }
+.finding-card:hover { border-color: var(--pink); box-shadow: var(--shadow); }
+.finding-card-severity { width: 4px; border-radius: 4px; align-self: stretch; flex-shrink: 0; }
+.finding-card-body { flex: 1; }
+.finding-card-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.finding-card-meta { font-size: 11px; color: var(--text-light); display: flex; gap: 12px; flex-wrap: wrap; }
+.finding-card-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* Responsive */
+@media (max-width: 1200px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } .domain-kpi-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { #dashboard { grid-template-columns: 1fr; } aside { display: none; } .charts-grid, .pbi-grid { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+
+    </style>
+</head>
+<body>
+
+<div class="tooltip" id="tooltip"></div>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login-page">
+    <div class="login-box">
+        <div class="login-brand">
+            <div class="logo-icon">S</div>
+            <h1>SUTHERLAND</h1>
+        </div>
+        <div class="login-subtitle">Enterprise Data Management Office</div>
+        <input type="text" id="username" placeholder="Username" value="admin">
+        <input type="password" id="password" placeholder="Password" value="admin">
+        <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+    <header>
+        <div class="header-left">
+            <div class="header-logo-icon" onclick="showMainDashboard()" title="Home">S</div>
+            <div class="header-title">Sutherland <span>Enterprise Data Management Office</span></div>
+        </div>
+        <div class="header-right">
+            <select class="quarter-select" id="quarterSelect" onchange="updateQuarter()">
+                <option value="2025Q1" selected>2025 Q1</option>
+                <option value="2024Q4">2024 Q4</option>
+                <option value="2024Q3">2024 Q3</option>
+                <option value="2024Q2">2024 Q2</option>
+            </select>
+            <button class="logout-btn" onclick="location.reload()">Logout</button>
+        </div>
+    </header>
+
+    <aside>
+        <div class="side-header">Navigation</div>
+        <div class="domain-item active" id="sidebar-overall" onclick="showOverall()">
+            <div class="domain-num" style="background:var(--pink); color:white;">⌂</div>
+            <span style="font-weight:700;">Overall</span>
+        </div>
+        <div class="domain-item" id="sidebar-ndi-dashboard" onclick="goToNDIDashboard()">
+            <div class="domain-num" style="background:var(--purple); color:white;">✦</div>
+            <span style="font-weight:700;">NDI Dashboard</span>
+        </div>
+        <div class="domain-item" id="sidebar-audit" onclick="showAuditCenter()">
+            <div class="domain-num" style="background:var(--teal); color:white;">⚑</div>
+            <span style="font-weight:700;">Audit Center</span>
+        </div>
+        <div class="side-header" style="margin-top:10px;">NDI Domains</div>
+        <div id="domain-list-container"></div>
+    </aside>
+
+    <main id="main-content">
+        <!-- ========== OVERALL PAGE ========== -->
+        <div id="overall-view" class="view-section active">
+            <div class="overall-content">
+                <div class="overall-hero animate-in">
+                    <div class="overall-hero-inner">
+                        <h1>Sutherland <span>Enterprise Data Management Office</span></h1>
+                        <p>Comprehensive NDI compliance assessment across 14 data management domains. Monitor maturity levels, track evidence completion, and drive data governance excellence.</p>
+                        <div class="overall-stats-strip" id="overall-hero-stats"></div>
+                    </div>
+                </div>
+                <div class="overall-quick-row">
+                    <div class="quick-card animate-in">
+                        <h4>Compliance Overview</h4>
+                        <div class="chart-subtitle">Overall gauge and maturity distribution</div>
+                        <div id="overall-gauge-area"></div>
+                    </div>
+                    <div class="quick-card animate-in">
+                        <h4>Domains Requiring Attention</h4>
+                        <div class="chart-subtitle">Lowest compliance scores — click to investigate</div>
+                        <div class="risk-list" id="overall-risk-list"></div>
+                    </div>
+                </div>
+                <div class="overall-section-header">
+                    <h3>All NDI Domains</h3>
+                    <a class="see-all" onclick="goToNDIDashboard()">Open NDI Dashboard →</a>
+                </div>
+                <div class="domain-cards-grid" id="domain-cards-grid"></div>
+            </div>
+        </div>
+
+        <!-- ========== NDI Dashboard ========== -->
+        <div id="general-view" class="view-section">
+            <div class="overview-content">
+                <div class="overview-tabs">
+                    <button class="overview-tab active" onclick="switchOverviewTab(this, 'overview')">Overview</button>
+                    <button class="overview-tab" onclick="switchOverviewTab(this, 'domainwise')">Domain-Wise Analysis</button>
+                    <button class="overview-tab" onclick="switchOverviewTab(this, 'diagnostic')">Diagnostic Analysis</button>
+                </div>
+                <div id="tab-overview" class="tab-panel" style="display:block;">
+                    <div class="kpi-row" id="kpi-row"></div>
+                    <div class="charts-grid">
+                        <div class="chart-card animate-in">
+                            <div class="chart-title">Complete Evidence Compliance by Domain</div>
+                            <div class="chart-subtitle">Percentage of fully compliant evidence across all domains</div>
+                            <div class="chart-area" id="domain-bar-chart"></div>
+                        </div>
+                        <div class="chart-card animate-in">
+                            <div class="chart-title">Complete Evidence Compliance by Maturity Level</div>
+                            <div class="chart-subtitle">Distribution across maturity levels 0–5</div>
+                            <div class="chart-area" id="maturity-bar-chart"></div>
+                        </div>
+                    </div>
+                    <div class="chart-card full animate-in">
+                        <div class="chart-title">Domain Compliance Summary</div>
+                        <div class="chart-subtitle">Click a domain row to view detailed analysis</div>
+                        <div id="compliance-table-container"></div>
+                    </div>
+                </div>
+                <div id="tab-domainwise" class="tab-panel" style="display:none;">
+                    <div class="filter-row">
+                        <span class="filter-label">Domain:</span>
+                        <select class="filter-select" id="domainwiseSelect" onchange="renderDomainwiseTab()"></select>
+                    </div>
+                    <div class="charts-grid" id="domainwise-charts"></div>
+                </div>
+                <div id="tab-diagnostic" class="tab-panel" style="display:none;">
+                    <div class="charts-grid">
+                        <div class="chart-card animate-in">
+                            <div class="chart-title">Evidence Completion Heatmap</div>
+                            <div class="chart-subtitle">Maturity Level vs Evidence Status per domain</div>
+                            <div class="chart-area" id="heatmap-chart"></div>
+                        </div>
+                        <div class="chart-card animate-in">
+                            <div class="chart-title">Compliance Score Distribution</div>
+                            <div class="chart-subtitle">Overall compliance gauge for selected quarter</div>
+                            <div class="chart-area" id="gauge-chart"></div>
+                        </div>
+                    </div>
+                    <div class="chart-card full animate-in">
+                        <div class="chart-title">Evidence Completion Trend Over Time</div>
+                        <div class="chart-subtitle">From Mar 2024 to Oct 2025</div>
+                        <div class="chart-area" id="trend-line-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== DOMAIN DETAIL ========== -->
+        <div id="domain-detail-view" class="view-section">
+            <div class="domain-detail-content">
+                <div class="domain-header-bar">
+                    <div>
+                        <div class="breadcrumb">
+                            <a onclick="showOverall()">Overall</a><span>›</span>
+                            <a onclick="goToNDIDashboard()">NDI Dashboard</a><span>›</span>
+                            <span id="breadcrumb-domain">Domain</span>
+                        </div>
+                        <h2 id="selected-domain-name">Domain Name</h2>
+                    </div>
+                </div>
+                <div class="domain-kpi-row" id="domain-kpi-row"></div>
+                <div class="section-tabs">
+                    <button class="section-tab active" onclick="switchSectionTab(this, 'excel-panel')">📊 Excel Data Sheet</button>
+                    <button class="section-tab" onclick="switchSectionTab(this, 'pbi-panel')">📈 Power BI Dashboard</button>
+                    <button class="section-tab" onclick="switchSectionTab(this, 'audit-panel')">🔍 Audit & Findings</button>
+                </div>
+                <div id="excel-panel" class="section-panel active">
+                    <div class="excel-card">
+                        <div class="excel-toolbar">
+                            <div class="excel-toolbar-left">
+                                <div class="excel-icon">X</div>
+                                <h4 id="excel-title">Domain Evidence Data</h4>
+                            </div>
+                            <input type="text" class="excel-search" placeholder="Search evidences..." oninput="filterExcelTable(this.value)">
+                        </div>
+                        <div class="excel-table-wrapper">
+                            <table class="excel-table" id="excel-table">
+                                <thead id="excel-thead"></thead>
+                                <tbody id="excel-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="pbi-panel" class="section-panel">
+                    <div id="pbi-dashboard-content"></div>
+                </div>
+                <div id="audit-panel" class="section-panel">
+                    <div id="domain-audit-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== AUDIT CENTER ========== -->
+        <div id="audit-view" class="view-section">
+            <div class="audit-content">
+                <div class="audit-page-header">
+                    <div>
+                        <div class="breadcrumb"><a onclick="showOverall()">Overall</a><span>›</span><span>Audit Center</span></div>
+                        <h2>Audit Center</h2>
+                    </div>
+                    <button class="audit-action-btn" onclick="openNewAuditModal()">+ Schedule New Audit</button>
+                </div>
+                <div class="kpi-row" id="audit-kpi-row"></div>
+                <div class="overview-tabs" style="margin-bottom:20px;">
+                    <button class="overview-tab active" onclick="switchAuditTab(this, 'audit-tab-schedule')">Audit Schedule</button>
+                    <button class="overview-tab" onclick="switchAuditTab(this, 'audit-tab-findings')">All Findings</button>
+                    <button class="overview-tab" onclick="switchAuditTab(this, 'audit-tab-trail')">Activity Trail</button>
+                    <button class="overview-tab" onclick="switchAuditTab(this, 'audit-tab-reports')">Reports & Export</button>
+                </div>
+                <div id="audit-tab-schedule" class="audit-tab-panel" style="display:block;">
+                    <div class="chart-card full">
+                        <div class="chart-title">Audit Schedule & Calendar</div>
+                        <div class="chart-subtitle">Upcoming and past audits across all domains</div>
+                        <div id="audit-schedule-table"></div>
+                    </div>
+                </div>
+                <div id="audit-tab-findings" class="audit-tab-panel" style="display:none;">
+                    <div class="filter-row">
+                        <span class="filter-label">Severity:</span>
+                        <select class="filter-select" id="findingSeverityFilter" onchange="renderAllFindings()">
+                            <option value="all">All</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+                        </select>
+                        <span class="filter-label">Status:</span>
+                        <select class="filter-select" id="findingStatusFilter" onchange="renderAllFindings()">
+                            <option value="all">All</option><option value="Open">Open</option><option value="In Progress">In Progress</option><option value="Resolved">Resolved</option><option value="Closed">Closed</option>
+                        </select>
+                        <span class="filter-label">Domain:</span>
+                        <select class="filter-select" id="findingDomainFilter" onchange="renderAllFindings()">
+                            <option value="all">All Domains</option>
+                        </select>
+                    </div>
+                    <div class="charts-grid">
+                        <div class="chart-card animate-in"><div class="chart-title">Findings by Severity</div><div class="chart-subtitle">Distribution across severity levels</div><div id="findings-severity-chart"></div></div>
+                        <div class="chart-card animate-in"><div class="chart-title">Findings by Status</div><div class="chart-subtitle">Current resolution status</div><div id="findings-status-chart"></div></div>
+                    </div>
+                    <div class="chart-card full"><div class="chart-title">All Audit Findings</div><div class="chart-subtitle">Click any finding to view details</div><div id="all-findings-table"></div></div>
+                </div>
+                <div id="audit-tab-trail" class="audit-tab-panel" style="display:none;">
+                    <div class="chart-card full">
+                        <div class="chart-title">Activity Trail</div>
+                        <div class="chart-subtitle">Complete audit log of all actions, changes, and events</div>
+                        <div class="filter-row" style="margin-top:12px;">
+                            <span class="filter-label">Type:</span>
+                            <select class="filter-select" id="trailTypeFilter" onchange="renderAuditTrail()">
+                                <option value="all">All Activities</option><option value="Evidence">Evidence Changes</option><option value="Finding">Finding Updates</option><option value="Audit">Audit Actions</option><option value="System">System Events</option>
+                            </select>
+                        </div>
+                        <div id="audit-trail-timeline"></div>
+                    </div>
+                </div>
+                <div id="audit-tab-reports" class="audit-tab-panel" style="display:none;">
+                    <div class="charts-grid">
+                        <div class="chart-card animate-in"><div class="chart-title">Compliance Readiness Report</div><div class="chart-subtitle">Overall audit readiness across all domains</div><div id="readiness-gauge"></div></div>
+                        <div class="chart-card animate-in"><div class="chart-title">Finding Aging Analysis</div><div class="chart-subtitle">Days open by severity</div><div id="aging-chart"></div></div>
+                    </div>
+                    <div class="chart-card full animate-in"><div class="chart-title">Export & Download Reports</div><div class="chart-subtitle">Generate audit reports for stakeholders</div><div class="export-grid" id="export-grid"></div></div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<!-- ========== MODALS ========== -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modal-title">Modal Title</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+    </div>
+</div>
+
+
+<script>
+// ============================
+// DATA MODEL — Real NDI Assessment Data
+// ============================
+const DOMAINS = [
+    { id: 1, name: "NDI Open Data Domain", short: "OD", color: "#ef335e" },
+    { id: 2, name: "NDI Personal Data Protection Domain", short: "PDP", color: "#7c5cfc" },
+    { id: 3, name: "NDI Reference and Master Data Management Domain", short: "RMDM", color: "#00c9b7" },
+    { id: 4, name: "NDI Business Intelligence and Analytics Domain", short: "BIA", color: "#f5a623" },
+    { id: 5, name: "NDI Data Architecture and Modelling Domain", short: "DAM", color: "#3498db" },
+    { id: 6, name: "NDI Data Catalog and Meta Data Management Domain", short: "DMCM", color: "#e67e22" },
+    { id: 7, name: "NDI Data Classification Domain", short: "DC", color: "#9b59b6" },
+    { id: 8, name: "NDI Data Governance Domain", short: "DG", color: "#1abc9c" },
+    { id: 9, name: "NDI Data Operations Domain", short: "DO", color: "#e74c3c" },
+    { id: 10, name: "NDI Data Quality Domain", short: "DQ", color: "#2ecc71" },
+    { id: 11, name: "NDI Data Sharing & Interoperability Domain", short: "DSI", color: "#f39c12" },
+    { id: 12, name: "NDI Data Value Realization Domain", short: "DVR", color: "#8e44ad" },
+    { id: 13, name: "NDI Document and Content Management Domain", short: "DCM", color: "#16a085" },
+    { id: 14, name: "NDI Freedom of Information Domain", short: "FOI", color: "#c0392b" }
+];
+
+// ---- REAL DATA from NDI Assessment Tables ----
+// Per-domain: completed specs by maturity level [L0,L1,L2,L3,L4,L5], partiallyCompleted, incomplete, target
+const REAL_DATA = {
+    1:  { levelCompleted: [3, 10, 15, 0, 0, 0], partial: 1,  incomplete: 5,  target: 34 },  // Open Data
+    2:  { levelCompleted: [3, 7,  8,  0, 0, 0], partial: 3,  incomplete: 3,  target: 24 },  // Personal Data Protection
+    3:  { levelCompleted: [3, 5,  0,  0, 0, 0], partial: 1,  incomplete: 19, target: 28 },  // Reference & Masterdata Mgmt
+    4:  { levelCompleted: [6, 15, 1,  0, 0, 0], partial: 1,  incomplete: 32, target: 55 },  // Business Intelligence & Analytics
+    5:  { levelCompleted: [2, 9,  0,  0, 0, 0], partial: 0,  incomplete: 16, target: 27 },  // Data Architecture & Modelling
+    6:  { levelCompleted: [3, 14, 0,  0, 0, 0], partial: 0,  incomplete: 22, target: 39 },  // Data Catalog & Metadata Mgmt
+    7:  { levelCompleted: [3, 4,  1,  0, 0, 0], partial: 0,  incomplete: 15, target: 23 },  // Data Classification
+    8:  { levelCompleted: [7, 12, 17, 0, 0, 0], partial: 3,  incomplete: 8,  target: 47 },  // Data Governance
+    9:  { levelCompleted: [3, 10, 1,  0, 0, 0], partial: 0,  incomplete: 25, target: 39 },  // Data Operations
+    10: { levelCompleted: [7, 10, 0,  0, 0, 0], partial: 0,  incomplete: 26, target: 43 },  // Data Quality
+    11: { levelCompleted: [4, 15, 6,  0, 0, 0], partial: 1,  incomplete: 20, target: 46 },  // Data Sharing & Interoperability
+    12: { levelCompleted: [2, 6,  0,  0, 0, 0], partial: 0,  incomplete: 11, target: 19 },  // Data Value Realization
+    13: { levelCompleted: [3, 8,  0,  0, 0, 0], partial: 2,  incomplete: 23, target: 36 },  // Document & Content Management
+    14: { levelCompleted: [2, 3, 10,  0, 0, 0], partial: 0,  incomplete: 6,  target: 21 }   // Freedom of Information
+};
+// Overall totals: Completed=238 (49.5%), Partial=12 (2.5%), Incomplete=231 (48.0%), Total=481
+
+// Build domain data from real numbers
+function buildDomainData(domainId) {
+    const rd = REAL_DATA[domainId];
+    const complete = rd.levelCompleted.reduce((s, v) => s + v, 0);
+    const partial = rd.partial;
+    const incomplete = rd.incomplete;
+    const totalEv = rd.target;
+    const complianceScore = totalEv > 0 ? Math.round((complete / totalEv) * 100) : 0;
+
+    // Maturity data per level — distribute partial and incomplete proportionally
+    const maturityData = [];
+    const totalCompByLevel = rd.levelCompleted.reduce((s, v) => s + v, 0) || 1;
+    let partialLeft = partial;
+    let incompleteLeft = incomplete;
+
+    for (let ml = 0; ml <= 5; ml++) {
+        const c = rd.levelCompleted[ml];
+        // Distribute partial and incomplete across levels that have specs or are below L3
+        let p = 0, ic = 0;
+        if (ml <= 2) {
+            const weight = (ml === 0 ? 0.1 : ml === 1 ? 0.4 : 0.5);
+            p = Math.round(partial * weight);
+            ic = Math.round(incomplete * weight);
+        }
+        maturityData.push({ level: ml, complete: c, partial: p, incomplete: ic, total: c + p + ic });
+    }
+
+    // Generate evidence rows from real numbers
+    const evidences = [];
+    const subAreas = ['Policy', 'Process', 'Technology', 'People', 'Governance', 'Metrics', 'Standards', 'Procedures'];
+    const assessors = ['Ahmed K.', 'Sara M.', 'Omar H.', 'Nora A.', 'Khalid R.'];
+    let seed = domainId * 137 + 42;
+    const r = (min, max) => { seed = (seed * 9301 + 49297) % 233280; return Math.floor(min + (seed / 233280) * (max - min + 1)); };
+
+    // Assign evidence items to maturity levels based on real level distribution
+    let evIdx = 1;
+    for (let ml = 0; ml <= 5; ml++) {
+        const cCount = rd.levelCompleted[ml];
+        for (let j = 0; j < cCount; j++) {
+            evidences.push({
+                id: `EV-${String(domainId).padStart(2,'0')}-${String(evIdx).padStart(3,'0')}`,
+                description: `${subAreas[r(0, subAreas.length - 1)]} — Level ${ml} specification ${j + 1}`,
+                maturityLevel: ml,
+                status: 'Complete',
+                score: r(80, 100),
+                lastUpdated: `2025-0${r(1,3)}-${String(r(1,28)).padStart(2,'0')}`,
+                assessor: assessors[r(0, assessors.length - 1)]
+            });
+            evIdx++;
+        }
+    }
+    // Partial items
+    for (let j = 0; j < partial; j++) {
+        const ml = r(1, 3);
+        evidences.push({
+            id: `EV-${String(domainId).padStart(2,'0')}-${String(evIdx).padStart(3,'0')}`,
+            description: `${subAreas[r(0, subAreas.length - 1)]} — Level ${ml} partial assessment`,
+            maturityLevel: ml,
+            status: 'Partial',
+            score: r(40, 79),
+            lastUpdated: `2025-0${r(1,3)}-${String(r(1,28)).padStart(2,'0')}`,
+            assessor: assessors[r(0, assessors.length - 1)]
+        });
+        evIdx++;
+    }
+    // Incomplete items
+    for (let j = 0; j < incomplete; j++) {
+        const ml = r(2, 5);
+        evidences.push({
+            id: `EV-${String(domainId).padStart(2,'0')}-${String(evIdx).padStart(3,'0')}`,
+            description: `${subAreas[r(0, subAreas.length - 1)]} — Level ${ml} pending assessment`,
+            maturityLevel: ml,
+            status: 'Incomplete',
+            score: r(0, 39),
+            lastUpdated: `2025-0${r(1,3)}-${String(r(1,28)).padStart(2,'0')}`,
+            assessor: assessors[r(0, assessors.length - 1)]
+        });
+        evIdx++;
+    }
+
+    // Trend data — show progression toward current state
+    const trend = [];
+    const months = ['Apr 2024','Jul 2024','Oct 2024','Jan 2025','Apr 2025','Jul 2025','Oct 2025'];
+    const finalComp = complete;
+    const finalInc = incomplete;
+    months.forEach((m, i) => {
+        const progress = (i + 1) / months.length;
+        const tc = Math.round(finalComp * progress * (0.4 + 0.6 * progress));
+        const ti = Math.max(0, totalEv - tc - Math.round(partial * progress));
+        const tp = totalEv - tc - ti;
+        trend.push({ month: m, complete: Math.min(tc, totalEv), partial: Math.max(0, tp), incomplete: Math.max(0, ti) });
+    });
+    // Override last month with actual numbers
+    trend[trend.length - 1] = { month: 'Oct 2025', complete, partial, incomplete };
+
+    return {
+        totalEvidences: totalEv,
+        complete, partial, incomplete,
+        complianceScore,
+        maturityData,
+        evidences,
+        trend,
+        deltaCE: r(-2, 8),
+        deltaPE: r(-1, 3),
+        deltaIE: r(-8, -1)
+    };
+}
+
+// Pre-generate all domain data
+const domainDataMap = {};
+DOMAINS.forEach(d => {
+    domainDataMap[d.id] = buildDomainData(d.id);
+});
+
+// Aggregate KPIs
+function getOverviewKPIs() {
+    let total = 0, complete = 0, partial = 0, incomplete = 0;
+    DOMAINS.forEach(d => {
+        const dd = domainDataMap[d.id];
+        total += dd.totalEvidences;
+        complete += dd.complete;
+        partial += dd.partial;
+        incomplete += dd.incomplete;
+    });
+    return {
+        total,
+        complete,
+        partial,
+        incomplete,
+        complianceScore: Math.round((complete / total) * 100)
+    };
+}
+
+// ============================
+// RENDERING
+// ============================
+
+// Build sidebar
+const listContainer = document.getElementById('domain-list-container');
+DOMAINS.forEach((d, i) => {
+    const div = document.createElement('div');
+    div.className = 'domain-item';
+    div.id = `sidebar-domain-${d.id}`;
+    div.innerHTML = `<div class="domain-num">${i + 1}</div><span>${d.name.replace('NDI ', '')}</span>`;
+    div.onclick = () => openDomain(d.id);
+    listContainer.appendChild(div);
+});
+
+// Populate domain-wise filter
+const dwSelect = document.getElementById('domainwiseSelect');
+DOMAINS.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.name.replace('NDI ', '').replace(' Domain', '');
+    dwSelect.appendChild(opt);
+});
+
+function doLogin() {
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'grid';
+    renderOverallPage();
+}
+
+function showOverall() {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById('overall-view').classList.add('active');
+    highlightSidebar('sidebar-overall');
+    renderOverallPage();
+}
+
+function goToNDIDashboard() {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById('general-view').classList.add('active');
+    highlightSidebar('sidebar-ndi-dashboard');
+    renderOverview();
+}
+
+function highlightSidebar(activeId) {
+    document.querySelectorAll('.domain-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById(activeId);
+    if (el) el.classList.add('active');
+}
+
+function showMainDashboard() {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById('overall-view').classList.add('active');
+    highlightSidebar('sidebar-overall');
+    renderOverallPage();
+}
+
+function switchOverviewTab(btn, tabId) {
+    document.querySelectorAll('.overview-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    document.getElementById(`tab-${tabId}`).style.display = 'block';
+
+    if (tabId === 'domainwise') renderDomainwiseTab();
+    if (tabId === 'diagnostic') renderDiagnosticTab();
+}
+
+function switchSectionTab(btn, panelId) {
+    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(panelId).classList.add('active');
+}
+
+function updateQuarter() {
+    renderOverview();
+}
+
+// ========== OVERALL PAGE ==========
+function renderOverallPage() {
+    const kpis = getOverviewKPIs();
+
+    // Hero stats
+    document.getElementById('overall-hero-stats').innerHTML = `
+        <div class="overall-stat">
+            <div class="overall-stat-value">${DOMAINS.length}</div>
+            <div class="overall-stat-label">NDI Domains</div>
+        </div>
+        <div class="overall-stat">
+            <div class="overall-stat-value">${kpis.total}</div>
+            <div class="overall-stat-label">Total Evidences</div>
+        </div>
+        <div class="overall-stat">
+            <div class="overall-stat-value teal">${kpis.complete}</div>
+            <div class="overall-stat-label">Complete</div>
+        </div>
+        <div class="overall-stat">
+            <div class="overall-stat-value amber">${kpis.partial}</div>
+            <div class="overall-stat-label">Partial</div>
+        </div>
+        <div class="overall-stat">
+            <div class="overall-stat-value pink-c">${kpis.incomplete}</div>
+            <div class="overall-stat-label">Incomplete</div>
+        </div>
+        <div class="overall-stat">
+            <div class="overall-stat-value purple">${kpis.complianceScore}%</div>
+            <div class="overall-stat-label">Compliance</div>
+        </div>
+    `;
+
+    // Overall gauge
+    document.getElementById('overall-gauge-area').innerHTML = buildMiniGauge(kpis.complianceScore).replace('Domain Compliance', 'Overall Compliance');
+
+    // Risk list — bottom 5 domains by compliance
+    const sorted = DOMAINS.map(d => ({ ...d, score: domainDataMap[d.id].complianceScore }))
+        .sort((a, b) => a.score - b.score);
+    const bottom5 = sorted.slice(0, 5);
+    document.getElementById('overall-risk-list').innerHTML = bottom5.map(d => {
+        const riskColor = d.score < 40 ? 'var(--pink)' : (d.score < 60 ? 'var(--amber)' : 'var(--teal)');
+        return `<div class="risk-item" onclick="openDomain(${d.id})">
+            <div class="risk-dot" style="background:${riskColor}"></div>
+            <div class="risk-name">${d.name.replace('NDI ','').replace(' Domain','')}</div>
+            <div class="risk-score" style="color:${riskColor}">${d.score}%</div>
+        </div>`;
+    }).join('');
+
+    // Domain cards grid
+    const cardsContainer = document.getElementById('domain-cards-grid');
+    cardsContainer.innerHTML = DOMAINS.map((d, i) => {
+        const dd = domainDataMap[d.id];
+        const pctColor = dd.complianceScore >= 60 ? 'var(--teal-dark)' : (dd.complianceScore >= 40 ? '#c76a00' : 'var(--pink)');
+        return `
+        <div class="domain-card animate-in" style="border-top-color:${d.color}; animation-delay:${i * 0.04}s;" onclick="openDomain(${d.id})">
+            <div class="domain-card-header">
+                <div class="domain-card-icon" style="background:${d.color}">${d.short.substring(0,2)}</div>
+                <div class="domain-card-name">${d.name.replace('NDI ','')}</div>
+            </div>
+            <div class="domain-card-metrics">
+                <div class="dc-metric">
+                    <div class="dc-metric-val" style="color:var(--teal)">${dd.complete}</div>
+                    <div class="dc-metric-lbl">Complete</div>
+                </div>
+                <div class="dc-metric">
+                    <div class="dc-metric-val" style="color:var(--amber)">${dd.partial}</div>
+                    <div class="dc-metric-lbl">Partial</div>
+                </div>
+                <div class="dc-metric">
+                    <div class="dc-metric-val" style="color:var(--pink)">${dd.incomplete}</div>
+                    <div class="dc-metric-lbl">Incomplete</div>
+                </div>
+            </div>
+            <div class="domain-card-progress">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width:${dd.complianceScore}%; background:${d.color};"></div>
+                </div>
+                <div class="domain-card-pct" style="color:${pctColor}">${dd.complianceScore}%</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ========== OVERVIEW ==========
+function renderOverview() {
+    const kpis = getOverviewKPIs();
+    const kpiRow = document.getElementById('kpi-row');
+    kpiRow.innerHTML = `
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Total Evidences</div>
+            <div class="kpi-value">${kpis.total}</div>
+            <div class="kpi-delta up">Across ${DOMAINS.length} Domains</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Complete Evidences</div>
+            <div class="kpi-value" style="color:var(--teal)">${kpis.complete}</div>
+            <div class="kpi-delta up">↑ +20</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Partial Evidences</div>
+            <div class="kpi-value" style="color:var(--amber)">${kpis.partial}</div>
+            <div class="kpi-delta up">↑ +7</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Incomplete Evidences</div>
+            <div class="kpi-value" style="color:var(--pink)">${kpis.incomplete}</div>
+            <div class="kpi-delta down">↓ -27</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Compliance Score</div>
+            <div class="kpi-value" style="color:var(--purple)">${kpis.complianceScore}%</div>
+            <div class="kpi-delta up">Selected Quarter</div>
+        </div>
+    `;
+
+    renderDomainBarChart();
+    renderMaturityBarChart();
+    renderComplianceTable();
+}
+
+function renderDomainBarChart() {
+    const container = document.getElementById('domain-bar-chart');
+    let html = `<div class="bar-chart">`;
+    DOMAINS.forEach(d => {
+        const dd = domainDataMap[d.id];
+        const pct = dd.complianceScore;
+        html += `
+            <div class="bar-group">
+                <div class="bar-wrapper">
+                    <div class="bar" style="height:${pct * 1.8}px; background:${d.color};" 
+                         onmouseenter="showTooltip(event,'${d.short}: ${pct}%')" onmouseleave="hideTooltip()">
+                        <div class="bar-value">${pct}%</div>
+                    </div>
+                </div>
+                <div class="bar-label">${d.short}</div>
+            </div>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+    // Animate bars
+    setTimeout(() => {
+        container.querySelectorAll('.bar').forEach(b => {
+            const h = b.style.height;
+            b.style.height = '0px';
+            requestAnimationFrame(() => { b.style.height = h; });
+        });
+    }, 50);
+}
+
+function renderMaturityBarChart() {
+    const container = document.getElementById('maturity-bar-chart');
+    // Aggregate maturity across domains
+    const totals = [0, 0, 0, 0, 0, 0];
+    const counts = [0, 0, 0, 0, 0, 0];
+    DOMAINS.forEach(d => {
+        const dd = domainDataMap[d.id];
+        dd.maturityData.forEach(m => {
+            totals[m.level] += m.complete;
+            counts[m.level] += m.total;
+        });
+    });
+
+    const pcts = totals.map((t, i) => counts[i] > 0 ? Math.round((t / counts[i]) * 100) : 0);
+    const colors = ['var(--pink)', 'var(--pink)', '#e67e22', 'var(--teal)', 'var(--purple)', '#3498db'];
+    const maxPct = Math.max(...pcts, 1);
+
+    let html = `<div class="maturity-bars">`;
+    pcts.forEach((p, i) => {
+        const h = (p / maxPct) * 170;
+        html += `
+            <div class="maturity-col">
+                <div class="maturity-bar" style="height:${h}px; background:${colors[i]};"
+                     onmouseenter="showTooltip(event,'Level ${i}: ${p}% compliance')" onmouseleave="hideTooltip()">
+                    <div class="maturity-pct">${p}%</div>
+                </div>
+                <div class="maturity-level">${i}</div>
+            </div>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+    setTimeout(() => {
+        container.querySelectorAll('.maturity-bar').forEach(b => {
+            const h = b.style.height;
+            b.style.height = '0px';
+            requestAnimationFrame(() => { b.style.height = h; });
+        });
+    }, 50);
+}
+
+function renderComplianceTable() {
+    const container = document.getElementById('compliance-table-container');
+    let html = `<table class="compliance-table"><thead><tr>
+        <th>Domain</th><th>Total</th><th>Complete</th><th>Partial</th><th>Incomplete</th><th>Compliance</th><th>Status</th>
+    </tr></thead><tbody>`;
+    DOMAINS.forEach(d => {
+        const dd = domainDataMap[d.id];
+        const statusClass = dd.complianceScore >= 60 ? 'ev-complete' : (dd.complianceScore >= 40 ? 'ev-partial' : 'ev-incomplete');
+        const statusText = dd.complianceScore >= 60 ? 'On Track' : (dd.complianceScore >= 40 ? 'Needs Attention' : 'At Risk');
+        html += `<tr onclick="openDomain(${d.id})">
+            <td style="font-weight:600; color:var(--navy);">${d.name.replace('NDI ','').replace(' Domain','')}</td>
+            <td>${dd.totalEvidences}</td>
+            <td style="color:var(--teal); font-weight:600;">${dd.complete}</td>
+            <td style="color:var(--amber); font-weight:600;">${dd.partial}</td>
+            <td style="color:var(--pink); font-weight:600;">${dd.incomplete}</td>
+            <td>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="progress-bar-bg" style="width:80px;">
+                        <div class="progress-bar-fill" style="width:${dd.complianceScore}%; background:${d.color};"></div>
+                    </div>
+                    <span style="font-weight:700; font-size:13px;">${dd.complianceScore}%</span>
+                </div>
+            </td>
+            <td><span class="evidence-status ${statusClass}">${statusText}</span></td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ========== DOMAIN-WISE TAB ==========
+function renderDomainwiseTab() {
+    const dId = parseInt(document.getElementById('domainwiseSelect').value);
+    const dd = domainDataMap[dId];
+    const d = DOMAINS.find(x => x.id === dId);
+    const container = document.getElementById('domainwise-charts');
+
+    // Evidence distribution by maturity count
+    let groupedBarsHtml = `<div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Complete</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Incomplete</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Partial</div>
+    </div><div class="grouped-bars">`;
+    const maxVal = Math.max(...dd.maturityData.map(m => Math.max(m.complete, m.partial, m.incomplete)), 1);
+    dd.maturityData.forEach(m => {
+        const hc = (m.complete / maxVal) * 170;
+        const hp = (m.partial / maxVal) * 170;
+        const hi = (m.incomplete / maxVal) * 170;
+        groupedBarsHtml += `<div class="grouped-col">
+            <div class="grouped-bar-set">
+                <div class="g-bar" style="height:${hc}px; background:var(--teal);"><div class="bar-value">${m.complete}</div></div>
+                <div class="g-bar" style="height:${hi}px; background:var(--pink);"><div class="bar-value">${m.incomplete}</div></div>
+                <div class="g-bar" style="height:${hp}px; background:var(--amber);"><div class="bar-value">${m.partial}</div></div>
+            </div>
+            <div class="bar-label">${m.level}</div>
+        </div>`;
+    });
+    groupedBarsHtml += `</div>`;
+
+    // Evidence distribution by maturity %
+    let pctBarsHtml = `<div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Complete%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Incomplete%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Partial%</div>
+    </div><div class="grouped-bars">`;
+    dd.maturityData.forEach(m => {
+        const tot = m.total || 1;
+        const pc = Math.round(m.complete / tot * 100);
+        const pp = Math.round(m.partial / tot * 100);
+        const pi = Math.round(m.incomplete / tot * 100);
+        const maxP = Math.max(pc, pp, pi, 1);
+        pctBarsHtml += `<div class="grouped-col">
+            <div class="grouped-bar-set">
+                <div class="g-bar" style="height:${(pc / 100) * 170}px; background:var(--teal);"><div class="bar-value">${pc}%</div></div>
+                <div class="g-bar" style="height:${(pi / 100) * 170}px; background:var(--pink);"><div class="bar-value">${pi}%</div></div>
+                <div class="g-bar" style="height:${(pp / 100) * 170}px; background:var(--amber);"><div class="bar-value">${pp}%</div></div>
+            </div>
+            <div class="bar-label">${m.level}</div>
+        </div>`;
+    });
+    pctBarsHtml += `</div>`;
+
+    // Trend line (simple SVG)
+    const trendSvg = buildTrendSVG(dd.trend);
+
+    container.innerHTML = `
+        <div class="chart-card animate-in">
+            <div class="chart-title">Evidence Distribution by Maturity Level (Count)</div>
+            <div class="chart-subtitle">Domain: ${d.name.replace('NDI ','').replace(' Domain','')}</div>
+            <div class="chart-area">${groupedBarsHtml}</div>
+        </div>
+        <div class="chart-card animate-in">
+            <div class="chart-title">Evidence Distribution by Maturity Level (%)</div>
+            <div class="chart-subtitle">Domain: ${d.name.replace('NDI ','').replace(' Domain','')}</div>
+            <div class="chart-area">${pctBarsHtml}</div>
+        </div>
+        <div class="chart-card full animate-in">
+            <div class="chart-title">Evidence Completion Trend Over Time</div>
+            <div class="chart-subtitle">From Mar 2024 to Oct 2025</div>
+            <div class="chart-area">${trendSvg}</div>
+        </div>`;
+
+    // Animate grouped bars
+    setTimeout(() => {
+        container.querySelectorAll('.g-bar').forEach(b => {
+            const h = b.style.height;
+            b.style.height = '0px';
+            requestAnimationFrame(() => { b.style.height = h; });
+        });
+    }, 50);
+}
+
+function buildTrendSVG(trend) {
+    const w = 700, h = 200, pad = 40;
+    const maxV = Math.max(...trend.flatMap(t => [t.complete, t.partial, t.incomplete]), 1);
+    const xStep = (w - pad * 2) / (trend.length - 1);
+
+    const line = (data, key, color) => {
+        let path = '';
+        data.forEach((d, i) => {
+            const x = pad + i * xStep;
+            const y = h - pad - (d[key] / maxV) * (h - pad * 2);
+            path += (i === 0 ? 'M' : 'L') + `${x},${y}`;
+        });
+        return `<polyline points="${path.replace(/[ML]/g, ' ').trim()}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    };
+
+    const dots = (data, key, color) => {
+        return data.map((d, i) => {
+            const x = pad + i * xStep;
+            const y = h - pad - (d[key] / maxV) * (h - pad * 2);
+            return `<circle cx="${x}" cy="${y}" r="4" fill="${color}" stroke="white" stroke-width="2"/>`;
+        }).join('');
+    };
+
+    const labels = trend.map((d, i) => {
+        const x = pad + i * xStep;
+        return `<text x="${x}" y="${h - 10}" text-anchor="middle" font-size="10" fill="#6e6e8a">${d.month}</text>`;
+    }).join('');
+
+    // Gridlines
+    let gridlines = '';
+    for (let i = 0; i <= 4; i++) {
+        const y = pad + i * ((h - pad * 2) / 4);
+        const val = Math.round(maxV - i * (maxV / 4));
+        gridlines += `<line x1="${pad}" y1="${y}" x2="${w - pad}" y2="${y}" stroke="#eee" stroke-width="1"/>`;
+        gridlines += `<text x="${pad - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#aaa">${val}</text>`;
+    }
+
+    return `<svg viewBox="0 0 ${w} ${h}" class="line-chart-svg">
+        ${gridlines}
+        ${line(trend, 'complete', '#00c9b7')}
+        ${line(trend, 'partial', '#f5a623')}
+        ${line(trend, 'incomplete', '#ef335e')}
+        ${dots(trend, 'complete', '#00c9b7')}
+        ${dots(trend, 'partial', '#f5a623')}
+        ${dots(trend, 'incomplete', '#ef335e')}
+        ${labels}
+    </svg>
+    <div class="chart-legend" style="margin-top:10px;">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Complete</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Partial</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Incomplete</div>
+    </div>`;
+}
+
+// ========== DIAGNOSTIC TAB ==========
+function renderDiagnosticTab() {
+    renderHeatmap();
+    renderGauge();
+    renderTrendLineOverall();
+}
+
+function renderHeatmap() {
+    const container = document.getElementById('heatmap-chart');
+    const shortDomains = DOMAINS.slice(0, 8);
+    let html = `<div class="heatmap-grid" style="grid-template-columns: 100px repeat(6, 1fr);">`;
+    // Header
+    html += `<div class="heatmap-header"></div>`;
+    for (let i = 0; i <= 5; i++) html += `<div class="heatmap-header" style="text-align:center;">ML ${i}</div>`;
+
+    shortDomains.forEach(d => {
+        const dd = domainDataMap[d.id];
+        html += `<div style="font-size:11px; font-weight:600; display:flex; align-items:center; padding:4px 0;">${d.short}</div>`;
+        dd.maturityData.forEach(m => {
+            const pct = m.total > 0 ? Math.round(m.complete / m.total * 100) : 0;
+            const bg = pct >= 70 ? 'rgba(0,201,183,0.25)' : (pct >= 40 ? 'rgba(245,166,35,0.25)' : 'rgba(239,51,94,0.2)');
+            const fg = pct >= 70 ? 'var(--teal-dark)' : (pct >= 40 ? '#c76a00' : 'var(--pink)');
+            html += `<div class="heatmap-cell" style="background:${bg}; color:${fg};"
+                      onmouseenter="showTooltip(event,'${d.short} ML${m.level}: ${pct}% complete')" onmouseleave="hideTooltip()">
+                ${pct}%
+                <div class="heatmap-cell-label">${m.complete}/${m.total}</div>
+            </div>`;
+        });
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function renderGauge() {
+    const container = document.getElementById('gauge-chart');
+    const kpis = getOverviewKPIs();
+    const pct = kpis.complianceScore;
+    const angle = (pct / 100) * 180;
+
+    // SVG arc
+    const cx = 90, cy = 85, r = 70;
+    const startAngle = Math.PI;
+    const endAngle = Math.PI + (angle / 180) * Math.PI;
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    const largeArc = angle > 180 ? 1 : 0;
+
+    // Background arc (full semicircle)
+    const bgX2 = cx + r * Math.cos(0);
+    const bgY2 = cy + r * Math.sin(0);
+
+    container.innerHTML = `
+        <div class="gauge-container">
+            <svg viewBox="0 0 180 110" class="gauge-svg">
+                <path d="M ${x1} ${y1} A ${r} ${r} 0 1 1 ${bgX2} ${bgY2}" fill="none" stroke="#eee" stroke-width="14" stroke-linecap="round"/>
+                <path d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" 
+                      stroke="${pct >= 60 ? 'var(--teal)' : (pct >= 40 ? 'var(--amber)' : 'var(--pink)')}" 
+                      stroke-width="14" stroke-linecap="round"/>
+            </svg>
+            <div class="gauge-value-text">${pct}%</div>
+            <div class="gauge-label-text">Overall Compliance</div>
+        </div>`;
+}
+
+function renderTrendLineOverall() {
+    // Aggregate trend
+    const months = ['Apr 2024','Jul 2024','Oct 2024','Jan 2025','Apr 2025','Jul 2025','Oct 2025'];
+    const aggTrend = months.map((m, mi) => {
+        let c = 0, p = 0, ic = 0;
+        DOMAINS.forEach(d => {
+            const dd = domainDataMap[d.id];
+            if (dd.trend[mi]) {
+                c += dd.trend[mi].complete;
+                p += dd.trend[mi].partial;
+                ic += dd.trend[mi].incomplete;
+            }
+        });
+        return { month: m, complete: c, partial: p, incomplete: ic };
+    });
+    document.getElementById('trend-line-chart').innerHTML = buildTrendSVG(aggTrend);
+}
+
+// ========== OPEN DOMAIN DETAIL ==========
+function openDomain(domainId) {
+    const d = DOMAINS.find(x => x.id === domainId);
+    const dd = domainDataMap[domainId];
+
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById('domain-detail-view').classList.add('active');
+    document.getElementById('selected-domain-name').innerHTML = d.name.replace('NDI ', '<span>NDI</span> ');
+    document.getElementById('breadcrumb-domain').textContent = d.short;
+    document.getElementById('excel-title').textContent = d.name + ' — Evidence Data';
+
+    // Highlight sidebar
+    document.querySelectorAll('.domain-item').forEach(el => el.classList.remove('active'));
+    const sideItem = document.getElementById(`sidebar-domain-${d.id}`);
+    if (sideItem) sideItem.classList.add('active');
+
+    // Reset to Excel tab
+    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.section-tab').classList.add('active');
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('excel-panel').classList.add('active');
+
+    // Domain KPIs
+    document.getElementById('domain-kpi-row').innerHTML = `
+        <div class="domain-kpi teal animate-in">
+            <div class="domain-kpi-label">Total Evidences</div>
+            <div class="domain-kpi-value">${dd.totalEvidences}</div>
+        </div>
+        <div class="domain-kpi animate-in" style="border-left-color:var(--teal);">
+            <div class="domain-kpi-label">Complete</div>
+            <div class="domain-kpi-value" style="color:var(--teal)">${dd.complete}</div>
+        </div>
+        <div class="domain-kpi amber animate-in">
+            <div class="domain-kpi-label">Partial</div>
+            <div class="domain-kpi-value" style="color:var(--amber)">${dd.partial}</div>
+        </div>
+        <div class="domain-kpi pink animate-in">
+            <div class="domain-kpi-label">Incomplete</div>
+            <div class="domain-kpi-value" style="color:var(--pink)">${dd.incomplete}</div>
+        </div>
+    `;
+
+    // Render Excel table
+    renderExcelTable(dd, d);
+
+    // Render Power BI dashboard
+    renderPBIDashboard(dd, d);
+
+    // Render Audit & Findings panel
+    if (typeof renderDomainAuditPanel === 'function') renderDomainAuditPanel(domainId);
+}
+
+function renderExcelTable(dd, domain) {
+    const thead = document.getElementById('excel-thead');
+    const tbody = document.getElementById('excel-tbody');
+    thead.innerHTML = `<tr>
+        <th>Evidence ID</th><th>Description</th><th>Maturity Level</th><th>Status</th><th>Score</th><th>Last Updated</th><th>Assessor</th>
+    </tr>`;
+    tbody.innerHTML = '';
+    dd.evidences.forEach(ev => {
+        const statusClass = ev.status === 'Complete' ? 'ev-complete' : (ev.status === 'Partial' ? 'ev-partial' : 'ev-incomplete');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-family:'Space Mono',monospace; font-size:11px; font-weight:700;">${ev.id}</td>
+            <td>${ev.description}</td>
+            <td><span class="level-badge lvl-${ev.maturityLevel}">${ev.maturityLevel}</span></td>
+            <td><span class="evidence-status ${statusClass}">${ev.status}</span></td>
+            <td style="font-weight:700;">${ev.score}</td>
+            <td style="color:var(--text-light); font-size:12px;">${ev.lastUpdated}</td>
+            <td>${ev.assessor}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+    window._currentExcelData = dd.evidences;
+}
+
+function filterExcelTable(query) {
+    if (!window._currentExcelData) return;
+    const tbody = document.getElementById('excel-tbody');
+    const q = query.toLowerCase();
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach((row, i) => {
+        const ev = window._currentExcelData[i];
+        if (!ev) return;
+        const match = ev.id.toLowerCase().includes(q) || ev.description.toLowerCase().includes(q) || ev.status.toLowerCase().includes(q) || ev.assessor.toLowerCase().includes(q);
+        row.style.display = match ? '' : 'none';
+    });
+}
+
+function renderPBIDashboard(dd, domain) {
+    const container = document.getElementById('pbi-dashboard-content');
+
+    // Donut chart data
+    const donutData = [
+        { label: 'Complete', value: dd.complete, color: 'var(--teal)' },
+        { label: 'Partial', value: dd.partial, color: 'var(--amber)' },
+        { label: 'Incomplete', value: dd.incomplete, color: 'var(--pink)' }
+    ];
+    const donutSVG = buildDonutSVG(donutData, dd.totalEvidences);
+
+    // Grouped bars for maturity
+    const maxVal = Math.max(...dd.maturityData.map(m => Math.max(m.complete, m.partial, m.incomplete)), 1);
+    let groupedHtml = `<div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Complete</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Incomplete</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Partial</div>
+    </div><div class="grouped-bars">`;
+    dd.maturityData.forEach(m => {
+        const hc = (m.complete / maxVal) * 170;
+        const hp = (m.partial / maxVal) * 170;
+        const hi = (m.incomplete / maxVal) * 170;
+        groupedHtml += `<div class="grouped-col">
+            <div class="grouped-bar-set">
+                <div class="g-bar" style="height:${hc}px; background:var(--teal);"><div class="bar-value">${m.complete}</div></div>
+                <div class="g-bar" style="height:${hi}px; background:var(--pink);"><div class="bar-value">${m.incomplete}</div></div>
+                <div class="g-bar" style="height:${hp}px; background:var(--amber);"><div class="bar-value">${m.partial}</div></div>
+            </div>
+            <div class="bar-label">ML ${m.level}</div>
+        </div>`;
+    });
+    groupedHtml += `</div>`;
+
+    // Score gauge
+    const gaugeSVG = buildMiniGauge(dd.complianceScore);
+
+    // Trend
+    const trendSVG = buildTrendSVG(dd.trend);
+
+    container.innerHTML = `
+        <div class="pbi-grid">
+            <div class="pbi-card animate-in">
+                <h4>Evidence Status Breakdown</h4>
+                <div class="chart-subtitle">Distribution of evidence completion status</div>
+                <div class="donut-container">${donutSVG}</div>
+            </div>
+            <div class="pbi-card animate-in">
+                <h4>Compliance Score</h4>
+                <div class="chart-subtitle">Overall domain compliance for selected quarter</div>
+                ${gaugeSVG}
+            </div>
+            <div class="pbi-card full animate-in">
+                <h4>Evidence Distribution by Maturity Level</h4>
+                <div class="chart-subtitle">Count of evidences at each maturity level by status</div>
+                <div class="chart-area">${groupedHtml}</div>
+            </div>
+            <div class="pbi-card full animate-in">
+                <h4>Evidence Completion Trend</h4>
+                <div class="chart-subtitle">Historical trend of evidence completion from Mar 2024 to Oct 2025</div>
+                <div class="chart-area">${trendSVG}</div>
+            </div>
+        </div>
+    `;
+
+    // Animate bars
+    setTimeout(() => {
+        container.querySelectorAll('.g-bar').forEach(b => {
+            const h = b.style.height;
+            b.style.height = '0px';
+            requestAnimationFrame(() => { b.style.height = h; });
+        });
+    }, 50);
+}
+
+function buildDonutSVG(data, total) {
+    const cx = 80, cy = 80, r = 60, strokeW = 22;
+    const circumference = 2 * Math.PI * r;
+    let offset = 0;
+
+    let paths = '';
+    data.forEach(d => {
+        const pct = d.value / total;
+        const dashLen = pct * circumference;
+        paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" 
+                   stroke="${d.color}" stroke-width="${strokeW}"
+                   stroke-dasharray="${dashLen} ${circumference - dashLen}"
+                   stroke-dashoffset="${-offset}"
+                   transform="rotate(-90 ${cx} ${cy})"
+                   style="transition: stroke-dasharray 0.8s ease;"/>`;
+        offset += dashLen;
+    });
+
+    const svg = `<svg viewBox="0 0 160 160" class="donut-svg">
+        ${paths}
+        <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="22" font-weight="700" fill="var(--navy)">${total}</text>
+        <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" fill="var(--text-light)">Total</text>
+    </svg>`;
+
+    const legend = data.map(d => `
+        <div class="donut-legend-item">
+            <div class="donut-legend-dot" style="background:${d.color}"></div>
+            ${d.label}
+            <span class="donut-legend-value">${d.value}</span>
+        </div>
+    `).join('');
+
+    return svg + `<div class="donut-legend">${legend}</div>`;
+}
+
+function buildMiniGauge(pct) {
+    const cx = 90, cy = 85, r = 70;
+    const startAngle = Math.PI;
+    const angle = (pct / 100) * 180;
+    const endAngle = Math.PI + (angle / 180) * Math.PI;
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    const bgX2 = cx + r * Math.cos(0);
+    const bgY2 = cy + r * Math.sin(0);
+    const largeArc = angle > 180 ? 1 : 0;
+    const color = pct >= 60 ? 'var(--teal)' : (pct >= 40 ? 'var(--amber)' : 'var(--pink)');
+
+    return `<div class="gauge-container">
+        <svg viewBox="0 0 180 110" class="gauge-svg">
+            <path d="M ${x1} ${y1} A ${r} ${r} 0 1 1 ${bgX2} ${bgY2}" fill="none" stroke="#eee" stroke-width="14" stroke-linecap="round"/>
+            <path d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round"/>
+        </svg>
+        <div class="gauge-value-text">${pct}%</div>
+        <div class="gauge-label-text">Domain Compliance</div>
+    </div>`;
+}
+
+// ========== TOOLTIP ==========
+function showTooltip(e, text) {
+    const tip = document.getElementById('tooltip');
+    tip.textContent = text;
+    tip.style.display = 'block';
+    tip.style.left = e.clientX + 12 + 'px';
+    tip.style.top = e.clientY - 10 + 'px';
+}
+
+function hideTooltip() {
+    document.getElementById('tooltip').style.display = 'none';
+}
+
+document.addEventListener('mousemove', e => {
+    const tip = document.getElementById('tooltip');
+    if (tip.style.display === 'block') {
+        tip.style.left = e.clientX + 12 + 'px';
+        tip.style.top = e.clientY - 10 + 'px';
+    }
+});
+
+// ============================
+// AUDIT DATA MODEL
+// ============================
+const AUDITORS = ['Ahmed K.', 'Sara M.', 'Omar H.', 'Nora A.', 'Khalid R.', 'Layla T.', 'Hassan B.'];
+const SEVERITIES = ['Critical', 'High', 'Medium', 'Low'];
+const FINDING_STATUSES = ['Open', 'In Progress', 'Resolved', 'Closed'];
+const AUDIT_STATUSES = ['Scheduled', 'In Progress', 'Completed', 'Overdue'];
+
+// Seeded random for audit data
+function auditRand(seed) {
+    let s = seed;
+    return (min, max) => {
+        s = (s * 9301 + 49297) % 233280;
+        return Math.floor(min + (s / 233280) * (max - min + 1));
+    };
+}
+
+// Generate audit schedule — one per domain
+const auditSchedule = [];
+DOMAINS.forEach((d, i) => {
+    const r = auditRand(d.id * 251 + 73 + i * 19);
+    const statusIdx = r(0, 3);
+    const month1 = 1 + (i % 3);
+    const month2 = month1 + 1;
+    const day = Math.min(28, 5 + i * 2);
+    auditSchedule.push({
+        id: `AUD-${String(d.id).padStart(3,'0')}`,
+        domain: d.name,
+        domainId: d.id,
+        auditor: AUDITORS[r(0, AUDITORS.length - 1)],
+        scheduledDate: `2025-0${month1}-${String(day).padStart(2,'0')}`,
+        dueDate: `2025-0${month2}-${String(day).padStart(2,'0')}`,
+        status: AUDIT_STATUSES[statusIdx],
+        completionPct: statusIdx === 2 ? 100 : (statusIdx === 1 ? r(30, 80) : (statusIdx === 3 ? r(10, 50) : 0)),
+        findings: r(1, 8)
+    });
+});
+
+// Realistic finding templates
+const findingTemplates = [
+    'Data classification policy not documented for sensitive categories',
+    'Access control matrix incomplete — missing role definitions',
+    'Metadata catalog missing descriptions for 40% of data assets',
+    'Data quality rules not automated — manual checks only',
+    'Retention policy not aligned with regulatory requirements',
+    'No formal data sharing agreement template in place',
+    'Business glossary incomplete — missing critical terms',
+    'Data lineage not tracked for key transformation pipelines',
+    'Incident response procedure not tested in 12+ months',
+    'Master data governance committee meetings not documented',
+    'PII inventory not updated since last assessment cycle',
+    'Data architecture diagrams outdated — last revision 18+ months',
+    'No formal training program for data stewards',
+    'KPI definitions inconsistent across reporting systems',
+    'Backup and recovery procedures not validated quarterly',
+    'Open data catalog missing licensing information',
+    'Interoperability standards not adopted across systems',
+    'Content management retention schedules not enforced',
+    'FOI response process exceeds mandated timeline',
+    'Analytics environment lacks proper access logging'
+];
+
+// Generate findings per domain
+const allFindings = [];
+let findingCounter = 1;
+DOMAINS.forEach(d => {
+    const numFindings = 2 + ((d.id * 7) % 5);
+    for (let f = 0; f < numFindings; f++) {
+        const r = auditRand(d.id * 313 + f * 97);
+        const sevIdx = r(0, 3);
+        const stIdx = r(0, 3);
+        const daysOpen = stIdx <= 1 ? r(3, 90) : r(1, 30);
+        allFindings.push({
+            id: `FND-${String(findingCounter++).padStart(4,'0')}`,
+            domainId: d.id,
+            domainShort: d.short,
+            domainName: d.name,
+            title: findingTemplates[(d.id * 3 + f) % findingTemplates.length],
+            severity: SEVERITIES[sevIdx],
+            status: FINDING_STATUSES[stIdx],
+            assignee: AUDITORS[r(0, AUDITORS.length - 1)],
+            raisedDate: `2025-0${1 + (f % 2)}-${String(Math.min(28, 3 + f * 5)).padStart(2,'0')}`,
+            dueDate: `2025-0${2 + (f % 3)}-${String(Math.min(28, 10 + f * 3)).padStart(2,'0')}`,
+            daysOpen,
+            evidenceRef: `EV-${String(d.id).padStart(2,'0')}-${String(1 + f * 3).padStart(3,'0')}`,
+            description: `During the assessment of ${d.name.replace('NDI ','')}, compliance gaps were identified in maturity level ${r(1,4)} requirements. Remediation actions have been recommended and assigned.`,
+            remediation: `1. Review current practices against NDI framework requirements.\n2. Update documentation and policies accordingly.\n3. Conduct team training within 30 days.\n4. Re-assess and validate compliance within 60 days.`
+        });
+    }
+});
+
+// Generate 50 audit trail events
+const auditTrail = [];
+const trailTemplates = [
+    { type: 'Evidence', action: 'Evidence status updated', detail: 'changed status from Incomplete to Partial' },
+    { type: 'Evidence', action: 'Evidence uploaded', detail: 'uploaded supporting document for evidence item' },
+    { type: 'Evidence', action: 'Score recalculated', detail: 'automatic score recalculation triggered' },
+    { type: 'Finding', action: 'Finding raised', detail: 'new finding created during audit review' },
+    { type: 'Finding', action: 'Finding assigned', detail: 'finding assigned to team member for remediation' },
+    { type: 'Finding', action: 'Finding resolved', detail: 'remediation completed and evidence attached' },
+    { type: 'Finding', action: 'Finding status changed', detail: 'status changed from Open to In Progress' },
+    { type: 'Audit', action: 'Audit scheduled', detail: 'new audit cycle scheduled for domain' },
+    { type: 'Audit', action: 'Audit started', detail: 'audit fieldwork commenced' },
+    { type: 'Audit', action: 'Audit completed', detail: 'audit report finalized and submitted' },
+    { type: 'System', action: 'Compliance report generated', detail: 'quarterly compliance report auto-generated' },
+    { type: 'System', action: 'User login', detail: 'user authenticated and accessed the portal' },
+    { type: 'System', action: 'Data refresh completed', detail: 'all domain data refreshed from source systems' }
+];
+
+for (let i = 0; i < 50; i++) {
+    const tpl = trailTemplates[i % trailTemplates.length];
+    const d = DOMAINS[i % DOMAINS.length];
+    const date = new Date(2025, 2, 15);
+    date.setDate(date.getDate() - Math.floor(i * 0.5));
+    const hrs = 8 + (i * 3) % 10;
+    const mins = (i * 7) % 60;
+
+    auditTrail.push({
+        id: i + 1,
+        type: tpl.type,
+        action: tpl.action,
+        detail: `${tpl.detail} — ${d.name.replace('NDI ','')}`,
+        user: AUDITORS[i % AUDITORS.length],
+        domain: d.short,
+        domainId: d.id,
+        timestamp: `${date.toISOString().slice(0,10)} ${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`,
+        ref: tpl.type === 'Evidence' ? `EV-${String(d.id).padStart(2,'0')}-${String(1 + i % 10).padStart(3,'0')}` :
+             tpl.type === 'Finding' ? `FND-${String(1 + i % allFindings.length).padStart(4,'0')}` :
+             tpl.type === 'Audit' ? `AUD-${String(d.id).padStart(3,'0')}` : '—'
+    });
+}
+
+// ============================
+// AUDIT CENTER — NAVIGATION
+// ============================
+function showAuditCenter() {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById('audit-view').classList.add('active');
+    highlightSidebar('sidebar-audit');
+    renderAuditCenter();
+}
+
+function renderAuditCenter() {
+    renderAuditKPIs();
+    renderAuditSchedule();
+    populateFindingDomainFilter();
+}
+
+function switchAuditTab(btn, tabId) {
+    // Scope tab switching to the audit-view only
+    const auditView = document.getElementById('audit-view');
+    auditView.querySelectorAll('.overview-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    auditView.querySelectorAll('.audit-tab-panel').forEach(p => p.style.display = 'none');
+    document.getElementById(tabId).style.display = 'block';
+
+    if (tabId === 'audit-tab-findings') renderAllFindings();
+    if (tabId === 'audit-tab-trail') renderAuditTrail();
+    if (tabId === 'audit-tab-reports') renderAuditReports();
+}
+
+// ============================
+// AUDIT KPIs
+// ============================
+function renderAuditKPIs() {
+    const totalFindings = allFindings.length;
+    const openFindings = allFindings.filter(f => f.status === 'Open').length;
+    const criticalOpen = allFindings.filter(f => f.severity === 'Critical' && f.status !== 'Closed').length;
+    const resolvedPct = Math.round(allFindings.filter(f => f.status === 'Resolved' || f.status === 'Closed').length / totalFindings * 100);
+    const completedAudits = auditSchedule.filter(a => a.status === 'Completed').length;
+
+    document.getElementById('audit-kpi-row').innerHTML = `
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Total Findings</div>
+            <div class="kpi-value">${totalFindings}</div>
+            <div class="kpi-delta down">Across ${DOMAINS.length} domains</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Open Findings</div>
+            <div class="kpi-value" style="color:var(--pink)">${openFindings}</div>
+            <div class="kpi-delta down">Requires attention</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Critical (Unresolved)</div>
+            <div class="kpi-value" style="color:#c9223f">${criticalOpen}</div>
+            <div class="kpi-delta down">High priority</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Resolution Rate</div>
+            <div class="kpi-value" style="color:var(--teal)">${resolvedPct}%</div>
+            <div class="kpi-delta up">Resolved or closed</div>
+        </div>
+        <div class="kpi-card animate-in">
+            <div class="kpi-label">Audits Completed</div>
+            <div class="kpi-value" style="color:var(--purple)">${completedAudits}/${auditSchedule.length}</div>
+            <div class="kpi-delta up">This cycle</div>
+        </div>
+    `;
+}
+
+// ============================
+// AUDIT SCHEDULE TABLE
+// ============================
+function renderAuditSchedule() {
+    let html = `<table class="audit-schedule-tbl"><thead><tr>
+        <th>Audit ID</th><th>Domain</th><th>Lead Auditor</th><th>Scheduled</th><th>Due</th><th>Progress</th><th>Findings</th><th>Status</th>
+    </tr></thead><tbody>`;
+
+    auditSchedule.forEach(a => {
+        const d = DOMAINS.find(x => x.id === a.domainId);
+        const statusClass = 'as-' + a.status.toLowerCase().replace(' ', '-');
+        const barColor = a.completionPct === 100 ? 'var(--teal)' : (a.completionPct > 0 ? 'var(--amber)' : 'var(--border)');
+        html += `<tr>
+            <td style="font-family:'Space Mono',monospace; font-size:11px; font-weight:700;">${a.id}</td>
+            <td style="font-weight:600;">${d ? d.short : a.domain}</td>
+            <td>${a.auditor}</td>
+            <td style="font-size:12px; color:var(--text-light);">${a.scheduledDate}</td>
+            <td style="font-size:12px; color:var(--text-light);">${a.dueDate}</td>
+            <td>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="progress-bar-bg" style="width:70px;">
+                        <div class="progress-bar-fill" style="width:${a.completionPct}%; background:${barColor};"></div>
+                    </div>
+                    <span style="font-size:11px; font-weight:700;">${a.completionPct}%</span>
+                </div>
+            </td>
+            <td style="font-weight:700; text-align:center;">${a.findings}</td>
+            <td><span class="audit-status ${statusClass}">${a.status}</span></td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+    document.getElementById('audit-schedule-table').innerHTML = html;
+}
+
+// ============================
+// ALL FINDINGS TAB
+// ============================
+function populateFindingDomainFilter() {
+    const sel = document.getElementById('findingDomainFilter');
+    if (sel && sel.options.length <= 1) {
+        DOMAINS.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.textContent = d.short;
+            sel.appendChild(opt);
+        });
+    }
+}
+
+function renderAllFindings() {
+    const sevFilter = document.getElementById('findingSeverityFilter').value;
+    const statusFilter = document.getElementById('findingStatusFilter').value;
+    const domainFilter = document.getElementById('findingDomainFilter').value;
+
+    let filtered = allFindings.slice();
+    if (sevFilter !== 'all') filtered = filtered.filter(f => f.severity === sevFilter);
+    if (statusFilter !== 'all') filtered = filtered.filter(f => f.status === statusFilter);
+    if (domainFilter !== 'all') filtered = filtered.filter(f => f.domainId === parseInt(domainFilter));
+
+    // Severity bar chart
+    const sevCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+    filtered.forEach(f => sevCounts[f.severity]++);
+    const sevColors = { Critical: 'var(--pink)', High: '#e74c3c', Medium: 'var(--amber)', Low: 'var(--teal)' };
+    const maxSev = Math.max(...Object.values(sevCounts), 1);
+    let sevHtml = '<div class="maturity-bars">';
+    Object.entries(sevCounts).forEach(([sev, count]) => {
+        sevHtml += `<div class="maturity-col">
+            <div class="maturity-bar" style="height:${(count / maxSev) * 150}px; background:${sevColors[sev]};">
+                <div class="maturity-pct">${count}</div>
+            </div>
+            <div class="maturity-level" style="font-size:10px;">${sev}</div>
+        </div>`;
+    });
+    sevHtml += '</div>';
+    document.getElementById('findings-severity-chart').innerHTML = sevHtml;
+
+    // Status bar chart
+    const stCounts = { 'Open': 0, 'In Progress': 0, 'Resolved': 0, 'Closed': 0 };
+    filtered.forEach(f => stCounts[f.status]++);
+    const stColors = { 'Open': 'var(--pink)', 'In Progress': 'var(--amber)', 'Resolved': 'var(--teal)', 'Closed': 'var(--text-light)' };
+    const maxSt = Math.max(...Object.values(stCounts), 1);
+    let stHtml = '<div class="maturity-bars">';
+    Object.entries(stCounts).forEach(([st, count]) => {
+        stHtml += `<div class="maturity-col">
+            <div class="maturity-bar" style="height:${(count / maxSt) * 150}px; background:${stColors[st]};">
+                <div class="maturity-pct">${count}</div>
+            </div>
+            <div class="maturity-level" style="font-size:10px;">${st}</div>
+        </div>`;
+    });
+    stHtml += '</div>';
+    document.getElementById('findings-status-chart').innerHTML = stHtml;
+
+    // Animate bars
+    setTimeout(() => {
+        document.querySelectorAll('#findings-severity-chart .maturity-bar, #findings-status-chart .maturity-bar').forEach(b => {
+            const h = b.style.height;
+            b.style.height = '0px';
+            requestAnimationFrame(() => { b.style.height = h; });
+        });
+    }, 50);
+
+    // Findings table
+    let tblHtml = `<table class="audit-schedule-tbl"><thead><tr>
+        <th>ID</th><th>Domain</th><th>Title</th><th>Severity</th><th>Status</th><th>Assignee</th><th>Days Open</th><th>Due</th>
+    </tr></thead><tbody>`;
+    filtered.forEach(f => {
+        const sevClass = 'sev-' + f.severity.toLowerCase();
+        const fsClass = 'fs-' + f.status.toLowerCase().replace(' ', '-');
+        tblHtml += `<tr onclick="openFindingModal('${f.id}')" style="cursor:pointer;">
+            <td style="font-family:'Space Mono',monospace; font-size:11px; font-weight:700;">${f.id}</td>
+            <td style="font-weight:600;">${f.domainShort}</td>
+            <td style="max-width:260px; white-space:normal; line-height:1.3;">${f.title}</td>
+            <td><span class="severity-badge ${sevClass}">${f.severity}</span></td>
+            <td><span class="finding-status ${fsClass}">${f.status}</span></td>
+            <td>${f.assignee}</td>
+            <td style="font-weight:700; color:${f.daysOpen > 30 ? 'var(--pink)' : 'var(--text)'};">${f.daysOpen}d</td>
+            <td style="font-size:12px; color:var(--text-light);">${f.dueDate}</td>
+        </tr>`;
+    });
+    tblHtml += '</tbody></table>';
+    document.getElementById('all-findings-table').innerHTML = tblHtml;
+}
+
+// ============================
+// ACTIVITY TRAIL
+// ============================
+function renderAuditTrail() {
+    const typeFilter = document.getElementById('trailTypeFilter').value;
+    let filtered = auditTrail.slice();
+    if (typeFilter !== 'all') filtered = filtered.filter(t => t.type === typeFilter);
+
+    let html = '<div class="trail-timeline">';
+    filtered.slice(0, 30).forEach(t => {
+        const cls = t.type.toLowerCase();
+        html += `<div class="trail-item">
+            <div class="trail-dot ${cls}"></div>
+            <div class="trail-body">
+                <div class="trail-header">
+                    <div class="trail-action">
+                        <span class="trail-tag ${cls}">${t.type}</span>
+                        ${t.action}
+                    </div>
+                    <div class="trail-time">${t.timestamp}</div>
+                </div>
+                <div class="trail-detail">
+                    <span class="trail-user">${t.user}</span> — ${t.detail}
+                    ${t.ref !== '—' ? ` <span style="font-family:'Space Mono',monospace; font-size:10px; opacity:0.6;">[${t.ref}]</span>` : ''}
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    document.getElementById('audit-trail-timeline').innerHTML = html;
+}
+
+// ============================
+// REPORTS & EXPORT TAB
+// ============================
+function renderAuditReports() {
+    // Readiness gauge
+    const kpis = getOverviewKPIs();
+    const resolvedRatio = allFindings.filter(f => f.status === 'Closed' || f.status === 'Resolved').length / allFindings.length;
+    const readiness = Math.round(kpis.complianceScore * 0.6 + resolvedRatio * 40);
+    document.getElementById('readiness-gauge').innerHTML = buildMiniGauge(readiness).replace('Domain Compliance', 'Audit Readiness');
+
+    // Finding aging analysis
+    const agingBuckets = { Critical: [], High: [], Medium: [], Low: [] };
+    allFindings.filter(f => f.status !== 'Closed').forEach(f => agingBuckets[f.severity].push(f.daysOpen));
+    const avgAging = {};
+    Object.entries(agingBuckets).forEach(([sev, days]) => {
+        avgAging[sev] = days.length ? Math.round(days.reduce((a, b) => a + b, 0) / days.length) : 0;
+    });
+    const maxAge = Math.max(...Object.values(avgAging), 1);
+    const agingColors = { Critical: 'var(--pink)', High: '#e74c3c', Medium: 'var(--amber)', Low: 'var(--teal)' };
+    let agingHtml = '<div class="maturity-bars">';
+    Object.entries(avgAging).forEach(([sev, avg]) => {
+        agingHtml += `<div class="maturity-col">
+            <div class="maturity-bar" style="height:${(avg / maxAge) * 150}px; background:${agingColors[sev]};">
+                <div class="maturity-pct">${avg}d</div>
+            </div>
+            <div class="maturity-level" style="font-size:10px;">${sev}</div>
+        </div>`;
+    });
+    agingHtml += '</div>';
+    document.getElementById('aging-chart').innerHTML = agingHtml;
+
+    // Animate
+    setTimeout(() => {
+        document.querySelectorAll('#aging-chart .maturity-bar').forEach(b => {
+            const h = b.style.height; b.style.height = '0px';
+            requestAnimationFrame(() => { b.style.height = h; });
+        });
+    }, 50);
+
+    // Export cards
+    document.getElementById('export-grid').innerHTML = `
+        <div class="export-card" onclick="alert('Generating Full Compliance Report...')">
+            <div class="export-icon" style="background:rgba(239,51,94,0.1); color:var(--pink);">📄</div>
+            <h5>Full Compliance Report</h5>
+            <p>Complete audit report across all 14 NDI domains with findings and recommendations</p>
+        </div>
+        <div class="export-card" onclick="alert('Generating Executive Summary...')">
+            <div class="export-icon" style="background:rgba(124,92,252,0.1); color:var(--purple);">📊</div>
+            <h5>Executive Summary</h5>
+            <p>One-page overview with KPIs, risk areas, and compliance score for leadership</p>
+        </div>
+        <div class="export-card" onclick="alert('Generating Findings Register...')">
+            <div class="export-icon" style="background:rgba(245,166,35,0.1); color:#b37300;">📋</div>
+            <h5>Findings Register (Excel)</h5>
+            <p>Exportable spreadsheet of all findings with severity, status, assignee, and due dates</p>
+        </div>
+        <div class="export-card" onclick="alert('Generating Audit Trail Log...')">
+            <div class="export-icon" style="background:rgba(0,201,183,0.1); color:var(--teal-dark);">🔒</div>
+            <h5>Audit Trail Log</h5>
+            <p>Complete chronological log of all system actions for regulatory compliance</p>
+        </div>
+        <div class="export-card" onclick="alert('Generating Remediation Tracker...')">
+            <div class="export-icon" style="background:rgba(52,152,219,0.1); color:#3498db;">🎯</div>
+            <h5>Remediation Tracker</h5>
+            <p>Status of all open findings with assigned owners and target resolution dates</p>
+        </div>
+        <div class="export-card" onclick="alert('Generating Domain Maturity Report...')">
+            <div class="export-icon" style="background:rgba(142,68,173,0.1); color:#8e44ad;">📈</div>
+            <h5>Domain Maturity Report</h5>
+            <p>Detailed maturity assessment per domain with evidence gaps and improvement plan</p>
+        </div>
+    `;
+}
+
+// ============================
+// DOMAIN-LEVEL AUDIT PANEL
+// ============================
+function renderDomainAuditPanel(domainId) {
+    const d = DOMAINS.find(x => x.id === domainId);
+    const domainFindings = allFindings.filter(f => f.domainId === domainId);
+    const domainAudit = auditSchedule.find(a => a.domainId === domainId);
+    const domainTrailItems = auditTrail.filter(t => t.domainId === domainId).slice(0, 10);
+
+    const openCount = domainFindings.filter(f => f.status === 'Open' || f.status === 'In Progress').length;
+    const resolvedCount = domainFindings.filter(f => f.status === 'Resolved' || f.status === 'Closed').length;
+
+    const bannerColor = domainAudit && domainAudit.status === 'Completed' ? 'var(--teal)' : 'var(--amber)';
+
+    let html = `
+        <div class="chart-card" style="border-left:4px solid ${bannerColor}; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <div style="font-size:14px; font-weight:700; color:var(--navy); margin-bottom:4px;">Audit Status: ${domainAudit ? domainAudit.status : 'Not Scheduled'}</div>
+                    <div style="font-size:12px; color:var(--text-light);">Lead: ${domainAudit ? domainAudit.auditor : '—'} · Scheduled: ${domainAudit ? domainAudit.scheduledDate : '—'} · Due: ${domainAudit ? domainAudit.dueDate : '—'}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:22px; font-weight:700; color:var(--pink);">${openCount}</div>
+                        <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Open</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:22px; font-weight:700; color:var(--teal);">${resolvedCount}</div>
+                        <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Resolved</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:22px; font-weight:700; color:var(--navy);">${domainFindings.length}</div>
+                        <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="domain-audit-section">
+            <div class="domain-audit-header"><h4>Findings (${domainFindings.length})</h4></div>`;
+
+    domainFindings.forEach(f => {
+        const sevColor = f.severity === 'Critical' ? 'var(--pink)' : (f.severity === 'High' ? '#e74c3c' : (f.severity === 'Medium' ? 'var(--amber)' : 'var(--teal)'));
+        const sevClass = 'sev-' + f.severity.toLowerCase();
+        const fsClass = 'fs-' + f.status.toLowerCase().replace(' ', '-');
+        html += `
+            <div class="finding-card" onclick="openFindingModal('${f.id}')">
+                <div class="finding-card-severity" style="background:${sevColor};"></div>
+                <div class="finding-card-body">
+                    <div class="finding-card-title">${f.title}</div>
+                    <div class="finding-card-meta">
+                        <span><span class="severity-badge ${sevClass}">${f.severity}</span></span>
+                        <span><span class="finding-status ${fsClass}">${f.status}</span></span>
+                        <span>📎 ${f.evidenceRef}</span>
+                        <span>👤 ${f.assignee}</span>
+                        <span>⏱ ${f.daysOpen}d open</span>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+    html += `</div>
+        <div class="domain-audit-section">
+            <div class="domain-audit-header"><h4>Recent Activity</h4></div>
+            <div class="trail-timeline">`;
+
+    domainTrailItems.forEach(t => {
+        const cls = t.type.toLowerCase();
+        html += `<div class="trail-item">
+            <div class="trail-dot ${cls}"></div>
+            <div class="trail-body">
+                <div class="trail-header">
+                    <div class="trail-action"><span class="trail-tag ${cls}">${t.type}</span> ${t.action}</div>
+                    <div class="trail-time">${t.timestamp}</div>
+                </div>
+                <div class="trail-detail"><span class="trail-user">${t.user}</span> — ${t.detail}</div>
+            </div>
+        </div>`;
+    });
+
+    html += '</div></div>';
+    document.getElementById('domain-audit-content').innerHTML = html;
+}
+
+// ============================
+// MODALS
+// ============================
+function openModal(title, bodyHtml) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-body').innerHTML = bodyHtml;
+    document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function openFindingModal(findingId) {
+    const f = allFindings.find(x => x.id === findingId);
+    if (!f) return;
+
+    const sevClass = 'sev-' + f.severity.toLowerCase();
+    const fsClass = 'fs-' + f.status.toLowerCase().replace(' ', '-');
+
+    const body = `
+        <div style="margin-bottom:20px;">
+            <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                <span class="severity-badge ${sevClass}">${f.severity}</span>
+                <span class="finding-status ${fsClass}">${f.status}</span>
+                <span style="font-family:'Space Mono',monospace; font-size:11px; color:var(--text-light); padding:4px 8px;">${f.id}</span>
+            </div>
+            <h4 style="font-size:15px; color:var(--navy); margin-bottom:6px;">${f.title}</h4>
+            <p style="font-size:12px; color:var(--text-light); line-height:1.6;">${f.description}</p>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm);">
+                <div style="font-size:10px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Domain</div>
+                <div style="font-size:13px; font-weight:600;">${f.domainName.replace('NDI ','')}</div>
+            </div>
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm);">
+                <div style="font-size:10px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Assignee</div>
+                <div style="font-size:13px; font-weight:600;">${f.assignee}</div>
+            </div>
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm);">
+                <div style="font-size:10px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Raised Date</div>
+                <div style="font-size:13px; font-weight:600;">${f.raisedDate}</div>
+            </div>
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm);">
+                <div style="font-size:10px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Due Date</div>
+                <div style="font-size:13px; font-weight:600; color:${f.daysOpen > 30 ? 'var(--pink)' : 'var(--text)'};">${f.dueDate} (${f.daysOpen}d open)</div>
+            </div>
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm);">
+                <div style="font-size:10px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Evidence Reference</div>
+                <div style="font-size:13px; font-weight:600; font-family:'Space Mono',monospace;">${f.evidenceRef}</div>
+            </div>
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm);">
+                <div style="font-size:10px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Days Open</div>
+                <div style="font-size:13px; font-weight:700; color:${f.daysOpen > 30 ? 'var(--pink)' : 'var(--teal)'};">${f.daysOpen} days</div>
+            </div>
+        </div>
+        <div>
+            <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Remediation Plan</div>
+            <div style="background:var(--bg); padding:14px; border-radius:var(--radius-sm); font-size:12px; color:var(--text); line-height:1.8; white-space:pre-line;">${f.remediation}</div>
+        </div>
+    `;
+
+    openModal('Finding Detail — ' + f.id, body);
+}
+
+function openNewAuditModal() {
+    const domainOpts = DOMAINS.map(d => `<option value="${d.id}">${d.name.replace('NDI ','')}</option>`).join('');
+    const auditorOpts = AUDITORS.map(a => `<option>${a}</option>`).join('');
+
+    const body = `
+        <div class="modal-form-group">
+            <label>Domain</label>
+            <select>${domainOpts}</select>
+        </div>
+        <div class="modal-form-row">
+            <div class="modal-form-group">
+                <label>Lead Auditor</label>
+                <select>${auditorOpts}</select>
+            </div>
+            <div class="modal-form-group">
+                <label>Audit Type</label>
+                <select>
+                    <option>Full Assessment</option>
+                    <option>Follow-up Review</option>
+                    <option>Spot Check</option>
+                    <option>Compliance Verification</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-form-row">
+            <div class="modal-form-group">
+                <label>Start Date</label>
+                <input type="date" value="2025-04-01">
+            </div>
+            <div class="modal-form-group">
+                <label>Due Date</label>
+                <input type="date" value="2025-05-01">
+            </div>
+        </div>
+        <div class="modal-form-group">
+            <label>Scope & Objectives</label>
+            <textarea placeholder="Describe the audit scope, key objectives, and focus areas..."></textarea>
+        </div>
+        <div class="modal-form-group">
+            <label>Priority Maturity Levels</label>
+            <select>
+                <option>All Levels (0–5)</option>
+                <option>Level 0–2 (Foundational)</option>
+                <option>Level 3–5 (Advanced)</option>
+            </select>
+        </div>
+        <button class="modal-submit-btn" onclick="alert('Audit scheduled successfully!'); closeModal();">Schedule Audit</button>
+    `;
+
+    openModal('Schedule New Audit', body);
+}
+
+</script>
+</body>
+</html>
