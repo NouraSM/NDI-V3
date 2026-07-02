@@ -1,0 +1,31 @@
+NDI-V3 — Packaged Source Snapshot
+==================================
+
+This archive is an exact export of a single git commit, packaged because
+this Claude Code cloud session does not have GitHub write access to push
+directly (see conversation for full diagnosis: git push and the GitHub API
+both return "403 Resource not accessible by integration" on write
+operations, while read operations succeed — the GitHub App installation
+for this session is read-only on NouraSM/NDI-V3).
+
+Commit hash   : 8cf3d241b190ea0568ac52ca372c79b98703ca69
+Short hash    : 8cf3d24
+Branch        : claude/accelerator-backend-design-b6cp97
+Commit date   : 2026-07-02T08:49:20+00:00
+Commit subject: Build production backend for NDI Enterprise Data Management Office
+Author        : Claude <noreply@anthropic.com>
+
+To restore this exact state as a real git repository once you have push
+access (or want to work locally):
+
+    git clone <your-repo-url> NDI-V3
+    cd NDI-V3
+    git checkout -b claude/accelerator-backend-design-b6cp97
+    # then copy this archive's files over (excluding this file and .git),
+    # or simply push this snapshot as the initial commit of that branch:
+    git add -A
+    git commit -m "Build production backend for NDI Enterprise Data Management Office"
+    git push -u origin claude/accelerator-backend-design-b6cp97
+
+See README.md for local development setup and free-tier deployment
+instructions (Vercel + Supabase/Neon).
