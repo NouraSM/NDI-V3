@@ -1,0 +1,289 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// AUTH / USERS
+// ============================================================
+
+enum Role {
+  ADMIN // full access, manages users, audits
+  DATA_STEWARD // edits evidence for assigned domains
+  AUDITOR // creates/manages audits & findings
+  VIEWER // read-only (executives)
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(VIEWER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Domains this user is the assigned steward for (DATA_STEWARD role)
+  stewardOf Domain[] @relation("DomainSteward")
+
+  evidenceUpdated  Evidence[]       @relation("EvidenceAssessor")
+  auditsLed        Audit[]          @relation("AuditLead")
+  findingsAssigned Finding[]        @relation("FindingAssignee")
+  findingComments  FindingComment[]
+  activityLogs     ActivityLog[]
+
+  @@map("users")
+}
+
+// ============================================================
+// NDI DOMAINS (fixed reference data — 14 domains)
+// ============================================================
+
+model Domain {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  shortCode   String  @unique
+  color       String
+  description String?
+  sortOrder   Int     @default(0)
+
+  stewardId String?
+  steward   User?   @relation("DomainSteward", fields: [stewardId], references: [id])
+
+  snapshots    DomainSnapshot[]
+  evidences    Evidence[]
+  audits       Audit[]
+  findings     Finding[]
+  activityLogs ActivityLog[]
+
+  @@map("domains")
+}
+
+// ============================================================
+// ASSESSMENT PERIODS (quarters) — makes the quarter selector real
+// ============================================================
+
+model AssessmentPeriod {
+  id        String   @id @default(cuid())
+  label     String   @unique // "2025Q1"
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(false)
+
+  snapshots DomainSnapshot[]
+  evidences Evidence[]
+
+  @@map("assessment_periods")
+}
+
+// Pre-aggregated per-domain, per-quarter rollup — avoids recomputing
+// compliance scores from evidence rows on every dashboard load and is
+// what actually makes the quarter dropdown change the numbers shown.
+model DomainSnapshot {
+  id       String           @id @default(cuid())
+  domainId Int
+  domain   Domain           @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  periodId String
+  period   AssessmentPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+
+  targetEvidence  Int
+  completeCount   Int
+  partialCount    Int
+  incompleteCount Int
+  complianceScore Int // 0-100, derived at write time
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([domainId, periodId])
+  @@map("domain_snapshots")
+}
+
+// ============================================================
+// EVIDENCE
+// ============================================================
+
+enum EvidenceStatus {
+  COMPLETE
+  PARTIAL
+  INCOMPLETE
+}
+
+model Evidence {
+  id       String           @id @default(cuid())
+  code     String           @unique // EV-01-001
+  domainId Int
+  domain   Domain           @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  periodId String
+  period   AssessmentPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+
+  description   String
+  subArea       String
+  maturityLevel Int // 0-5
+  status        EvidenceStatus
+  score         Int // 0-100
+
+  assessorId String?
+  assessor   User?   @relation("EvidenceAssessor", fields: [assessorId], references: [id])
+
+  attachments EvidenceAttachment[]
+  findings    Finding[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([domainId, periodId])
+  @@index([status])
+  @@map("evidence")
+}
+
+model EvidenceAttachment {
+  id         String   @id @default(cuid())
+  evidenceId String
+  evidence   Evidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  fileName   String
+  fileUrl    String
+  fileSize   Int
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  @@map("evidence_attachments")
+}
+
+// ============================================================
+// AUDITS
+// ============================================================
+
+enum AuditStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum AuditType {
+  FULL_ASSESSMENT
+  FOLLOW_UP_REVIEW
+  SPOT_CHECK
+  COMPLIANCE_VERIFICATION
+}
+
+model Audit {
+  id            String @id @default(cuid())
+  code          String @unique // AUD-001
+  domainId      Int
+  domain        Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  leadAuditorId String
+  leadAuditor   User   @relation("AuditLead", fields: [leadAuditorId], references: [id])
+
+  type           AuditType   @default(FULL_ASSESSMENT)
+  scheduledDate  DateTime
+  dueDate        DateTime
+  status         AuditStatus @default(SCHEDULED)
+  completionPct  Int         @default(0)
+  scopeNotes     String?
+  priorityLevels String? // "All Levels (0-5)" etc.
+
+  findings Finding[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("audits")
+}
+
+// ============================================================
+// FINDINGS
+// ============================================================
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum FindingStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Finding {
+  id         String    @id @default(cuid())
+  code       String    @unique // FND-0001
+  domainId   Int
+  domain     Domain    @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  auditId    String?
+  audit      Audit?    @relation(fields: [auditId], references: [id])
+  evidenceId String?
+  evidence   Evidence? @relation(fields: [evidenceId], references: [id])
+
+  title       String
+  description String
+  severity    Severity
+  status      FindingStatus @default(OPEN)
+  assigneeId  String?
+  assignee    User?         @relation("FindingAssignee", fields: [assigneeId], references: [id])
+
+  raisedDate      DateTime @default(now())
+  dueDate         DateTime
+  remediationPlan String?
+
+  comments FindingComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([severity])
+  @@index([status])
+  @@index([domainId])
+  @@map("findings")
+}
+
+model FindingComment {
+  id        String   @id @default(cuid())
+  findingId String
+  finding   Finding  @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+
+  @@map("finding_comments")
+}
+
+// ============================================================
+// ACTIVITY LOG (real audit trail, written on every mutation)
+// ============================================================
+
+enum ActivityType {
+  EVIDENCE
+  FINDING
+  AUDIT
+  SYSTEM
+}
+
+model ActivityLog {
+  id        String       @id @default(cuid())
+  type      ActivityType
+  action    String
+  detail    String
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id])
+  domainId  Int?
+  domain    Domain?      @relation(fields: [domainId], references: [id])
+  refType   String?
+  refId     String?
+  createdAt DateTime     @default(now())
+
+  @@index([type])
+  @@index([domainId])
+  @@index([createdAt])
+  @@map("activity_log")
+}
